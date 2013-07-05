@@ -1,0 +1,180 @@
+MMTTY version up information
+
+***********************************************************************
+Revision history Ver1.68 -> Ver1.68A (JE3HHT)
+***********************************************************************
+- Fixed RX level inconsistency
+- Fixed context-sensitive help problem
+
+***********************************************************************
+Revision history Ver1.66G -> Ver1.68 (JE3HHT)
+***********************************************************************
+- Added an FFT-based demodulator
+- Updated the MMTTY web URL
+- Added RXM_PTTFSK to the remote mode (Tnx to K4CY)
+- Deleted Cabrillo export function
+- Added Dual Peak Filter (Tnx to AA6YQ)
+
+***********************************************************************
+Revision history Ver1.66F -> Ver1.66G (AA6YQ)
+***********************************************************************
+
+1. Changes to the Main window's Options menu
+- Soundcard Output Level works on Vista (tnx to Ken VE5KC)
+- Soundcard Input Level works on Vista (tnx to Ken VE5KC)
+
+***********************************************************************
+Revision history Ver1.65D -> Ver1.66F (AA6YQ)
+***********************************************************************
+
+Dave, AA6YQ begins updating MMTTY
+
+1. Changes to the "MMTTY Setup" window
+
+A. "TX" tab
+- renamed the "PTT" panel to "PTT & FSK" (tnx to Joe W4TV)
+- added com8 through com16 to the "PTT & FSK" panel's "Port" selector
+- clicking a button in the "Input Button" panel from a non-Japanese locale displays a window entitled "Edit Button" (tnx to Joe W
+
+B. "Misc" tab
+- the new "Device Identifiers" panel enables independent selection of soundcard devices for reception ("RX") and transmission ("TX"); any of 16 input and output soundcard devices can be selected (tnx to Gil W0MN and Joe W4TV)
+- selecting an "RX" or "TX" device identifier in the "Device Identifiers" panel updates the respective "Reception" or "Transmission" panels shown on the new "Soundcard" tab
+
+C. "Soundcard" tab (new)
+- the "Reception" panel shows all installed soundcard input devices; selecting an input device updates the "RX" selector in the "Misc" tab's "Device Identifiers" panel
+- the "Transmission" panel shows all installed soundcard output devices; selecting an output device updates the "TX" selector in the "Misc" tab's "Device Identifiers" panel
+
+2. Changes to the "Radio Command" window
+- added com8 through com16 to the "Port" selector
+- added 38400 and 57600 to the "Baud" selector (tnx to Joe W4TV)
+- named the selector in the lower-left corner "Group"
+- modified the contents of the "Group" selector:
+
+*** renamed the previous "Yaesu HF? (FT-1000MP,...)" entry to "Yaesu FT 1000D, 1000MP, 920"
+*** renamed the previous "Yaesu VU? (FT-736,FT-847)" entry to "Yaesu FT 736, 817, 847, 857, 897"
+*** added a "Yaesu FT 9000, 2000, 950, 450" entry (tnx to Joe W4TV and Art W2NRA)
+*** renamed the previous "Kenwood" entry to "Kenwood, Elecraft" (tnx to Joe W4TV)
+
+- renamed the "Commands" panel's "VFO Polling" selector to "Model", and added entries for the Yaesu FT 9000, 2000, 950, and 450 (tnx to Joe W4TV)
+
+***********************************************************************
+Revision history Ver1.65 -> Ver1.65D
+***********************************************************************
+- Added a gateway to Turbo Hamlog/Win version 5 (Tnx to JG1MOU)
+- Fixed minor bugs
+
+***********************************************************************
+Revision history Ver1.64 -> Ver1.65
+***********************************************************************
+- Fixed a bug that caused the uncertain transmission in the remote mode.
+- Fixed minor bugs
+
+***********************************************************************
+Revision history Ver1.63 -> Ver1.64
+***********************************************************************
+
+- Improved the TX/RX switching speed in FSK
+- Added custom log link
+- Added custom RadioCommand
+- Added custom sound
+- Added custom TNC emulation
+- Fixed minor bugs
+
+***********************************************************************
+Revision history Ver1.62 -> Ver1.63
+***********************************************************************
+
+- Improved the low-level sound buffer processing
+- Added the full-duplex mode
+- Added TX offset for the soundcard
+- Supported BARTG contest (serial number + UTC)
+- Moved the RX log settings from the setup menu to the File menu
+- Added JST245 support in frequency polling
+- Added a menu for the version up information
+- Added EXTFSK port (EXTFSK.DLL required)
+- Added an option to accommodate J-BELL and S-BELL code sets
+- Improved the program termination speed
+- Supported WM_MOUSEWHEEL message
+- Fixed some minor bugs
+
+
+==================================
+Improvement on the low-level sound processing
+==================================
+
+The low-level sound processing has been improved.  The user can preset the sizes of TX and RX FIFO buffers even independently.  If you frequently see "Sound lost" in the spectrum scope window, try increasing the sizes of the FIFO buffers.
+
+Click on Option, Setup MMTTY, and Misc tab.  You will find the drop down list for presetting the sizes at the top left corner of the window.
+
+* MMTTY now automatically adjusts the buffer size, which was defined in the Setup menu in the previous MMTTY versions.
+
+
+================================
+Full duplex mode
+================================
+
+Version 1.62B has an option that simultaneously runs the record and play functions of the soundcard, so that it can make the external loop back possible.  This is useful for the satellite communication and the monitor of the FSK operation.
+Click Option, Setup MMTTY, and Misc tab.  Select Ext.(SAT) in the Sound loopback pane to enable the full duplex mode.
+The local echo option in the TX window of the Setup MMTTY has been deleted as it would result in the same effect as the no loop back mode.
+
+The internal linkage of the TX and RX modules for the no loop back, internal loop back, and external loop back modes are as follows:
+
+<Sound loop back off>
+
+   TxData ---> Modulator ---> Sound Out -->
+           |
+           --> RX window
+
+<Internal loop back (default)>
+
+   TxData ---> Modulator ---> Sound Out -->
+                          |
+                          --> Demodulator -> RX window
+
+<External loop back (for satellite)>
+
+   TxData ---> Modulator ---> Sound Out ---->
+
+                          --  Sound In <--
+                          |
+                          --> Demodulator -> RX window
+
+
+===================================
+TX offset
+===================================
+
+Some soundcards inadvertently have different sampling frequencies in the record (RX) and play (TX) operations.  With MMTTY version 1.62A, the user can calibrate the sampling frequency for TX.  The parameter to be set in the TX offset is the same as that of MMSSTV.  To obtain the precise value of the parameter, you have to use MMSSTV.  In the case of RTTY, however, the TX offset is not necessarily very accurate contrary to SSTV.  So the simple adjustment procedure shown below should give enough accuracy for RTTY.
+
+1) Adjust the RX sampling frequency.
+2) Click on Option, Setup MMTTY, and Misc tab.  Select Ext.(SAT) in the loop back.
+3) Connect the output and input of the soundcard, or select "loop-back" or "Stereo/monaural mixer" in the mixer program of the volume control.
+4) Adjust the TXOffset so that the twin peaks in the spectrum scope are on the line marker.
+
+According to my experiences, recent soundcards tend to come into one of the following three categories.
+
+	RX		TX		TX offset
+	~11025		~11025		0
+	~11025		~11100		75.00
+	~11100		~11025		-75.00
+
+Therefore, if you find some discrepancy in the spectrum scope, try putting 75.00 or -75.00 in the TXOffset.
+
+In RTTY, offset frequency 75Hz with respect to base frequency 11025Hz results in 5 to 15Hz frequency discrepancy.  The baud rate discrepancy is about 6800ppm (0.68%).  RTTY has substantial amount of margin for the discrepancies, so I do not think they are problematic in real QSOs.
+
+
+================================================
+RX log setting moved from the setup menu to the File menu
+================================================
+To save the system resources in the remote mode, the settings of the RX log have been moved from the setup menu to the File menu.  Click on File and select Options of received-log.
+
+==================
+EXTFSK port
+==================
+EXTFSK is used for the USB-FSK interface made by JA7UDE Oba.  To use the EXTFSK port, select EXTFSK from the PTT port drop-down list in MMTTY Setup window.  EXTFSK.DLL must exist in the same folder where MMTTY is installed.  For more information, refer to the following web site.
+
+http://www.archi.is.tohoku.ac.jp/~ooba/ja7ude
+
+
+73, Mako
+

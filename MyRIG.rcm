@@ -1,0 +1,8 @@
+[RADIO]
+CmdInit=\$0000000000
+CmdRx=\$0000000088
+CmdTx=\$0000000008\w10
+PollType=2
+PollOffset=0
+PollInterval=0
+Cmdxx=04

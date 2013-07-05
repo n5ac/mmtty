@@ -1,0 +1,470 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{8A19E7D5-B824-4AED-A872-E0689B281994}</ProjectGuid>
+        <ProjectType>CppVCLApplication</ProjectType>
+        <MainSource>mmtty.cpp</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <ProjectVersion>14.6</ProjectVersion>
+        <AppType>Application</AppType>
+        <FrameworkType>VCL</FrameworkType>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>1</TargetedPlatforms>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
+        <Cfg_1_Win64>true</Cfg_1_Win64>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
+        <Cfg_2_Win64>true</Cfg_2_Win64>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Locale>1041</VerInfo_Locale>
+        <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <LinkPackageStatics>rtl.lib;vcl.lib;vclx.lib;dbrtl.lib;vcldb.lib;bdertl.lib;vcldbx.lib</LinkPackageStatics>
+        <PackageImports>vclx.bpi;rtl.bpi;vcl.bpi;dbrtl.bpi;vcldb.bpi;bdertl.bpi;vcldbx.bpi;bcbsmp.bpi;teeui.bpi;teedb.bpi;tee.bpi;ibsmp.bpi;inetdb.bpi;inet.bpi;$(PackageImports)</PackageImports>
+        <BCC_PCHCache>true</BCC_PCHCache>
+        <ILINK_AppType>Windows</ILINK_AppType>
+        <DCC_IncludePath>.\;$(BDS)\lib;$(BDS)\lib\obj;$(DCC_IncludePath)</DCC_IncludePath>
+        <BRCC_IncludePath>$(BDS)\include;$(BDS)\include\vcl;$(BRCC_IncludePath)</BRCC_IncludePath>
+        <BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
+        <BCC_IncludePath>$(BDS)\include;$(BDS)\include\vcl;$(BCC_IncludePath)</BCC_IncludePath>
+        <TASM_IncludePath>$(BDS)\include;$(BDS)\include\vcl;$(TASM_IncludePath)</TASM_IncludePath>
+        <FinalOutputDir>.</FinalOutputDir>
+        <OutputExt>exe</OutputExt>
+        <AllPackageLibs>rtl.lib;vcl.lib;vclx.lib;dbrtl.lib;vcldb.lib;bdertl.lib;vcldbx.lib</AllPackageLibs>
+        <TASM_Debugging>None</TASM_Debugging>
+        <TASM_AdditionalSwitches> /w2</TASM_AdditionalSwitches>
+        <DCC_AdditionalSwitches> -M</DCC_AdditionalSwitches>
+        <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
+        <DCC_UnitSearchPath>.\;$(BDS)\lib;$(BDS)\lib\obj;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <ILINK_LibraryPath>$(BDS)\lib\obj;$(BDS)\lib;$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <IncludePath>$(BDSINCLUDE)\windows\vcl;$(IncludePath)</IncludePath>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <BCC_UserSuppliedOptions> -tWM -Vx -d -Ve</BCC_UserSuppliedOptions>
+        <Icon_MainIcon>mmtty_Icon.ico</Icon_MainIcon>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <IncludePath>$(BDSINCLUDE)\windows\vcl;$(IncludePath)</IncludePath>
+        <Icon_MainIcon>mmtty_Icon.ico</Icon_MainIcon>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <BCC_MonitorGlobalAndStackData>true</BCC_MonitorGlobalAndStackData>
+        <BCC_MonitorThis>true</BCC_MonitorThis>
+        <BCC_MonitorInlinePtrAccess>true</BCC_MonitorInlinePtrAccess>
+        <ILINK_LibraryPath>$(BDS)\lib\debug;$(ILINK_LibraryPath);$(ILINK_LibraryPath)</ILINK_LibraryPath>
+        <DCC_Define>DEBUG;$(DCC_Define);$(DCC_Define)</DCC_Define>
+        <BCC_SourceDebuggingOn>true</BCC_SourceDebuggingOn>
+        <IntermediateOutputDir>Debug_Build</IntermediateOutputDir>
+        <ILINK_FullDebugInfo>true</ILINK_FullDebugInfo>
+        <TASM_DisplaySourceLines>true</TASM_DisplaySourceLines>
+        <ILINK_DisableIncrementalLinking>true</ILINK_DisableIncrementalLinking>
+        <BCC_DisableOptimizations>true</BCC_DisableOptimizations>
+        <TASM_Debugging>Full</TASM_Debugging>
+        <DCC_AdditionalSwitches> -M -V</DCC_AdditionalSwitches>
+        <BCC_DebugLineNumbers>true</BCC_DebugLineNumbers>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <BCC_InlineFunctionExpansion>false</BCC_InlineFunctionExpansion>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <BCC_AllCodeguardOptions>false</BCC_AllCodeguardOptions>
+        <BCC_MonitorGlobalAndStackData>false</BCC_MonitorGlobalAndStackData>
+        <BCC_MonitorThis>false</BCC_MonitorThis>
+        <BCC_MonitorInlinePtrAccess>false</BCC_MonitorInlinePtrAccess>
+        <Manifest_File>None</Manifest_File>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <BCC_Defines>_DEBUG;$(BCC_Defines);$(BCC_Defines)</BCC_Defines>
+        <BCC_UserSuppliedOptions> -tWM -Vx -d -Ve -k</BCC_UserSuppliedOptions>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
+        <BCC_Defines>_DEBUG;$(BCC_Defines);$(BCC_Defines)</BCC_Defines>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <IntermediateOutputDir>Release_Build</IntermediateOutputDir>
+        <DCC_AdditionalSwitches> -M -$O+</DCC_AdditionalSwitches>
+        <ILINK_LibraryPath>$(BDS)\lib\release;$(ILINK_LibraryPath);$(ILINK_LibraryPath)</ILINK_LibraryPath>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <BCC_Defines>NDEBUG;$(BCC_Defines);$(BCC_Defines)</BCC_Defines>
+        <BCC_UserSuppliedOptions> -tWM -Vx -d -Ve -r</BCC_UserSuppliedOptions>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
+        <BCC_Defines>NDEBUG;$(BCC_Defines);$(BCC_Defines)</BCC_Defines>
+    </PropertyGroup>
+    <ItemGroup>
+        <CppCompile Include="ClockAdj.cpp">
+            <BuildOrder>9</BuildOrder>
+            <Form>ClockAdjDlg</Form>
+            <DependentOn>ClockAdj.h</DependentOn>
+            <BuildOrder>27</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="CLX.cpp">
+            <BuildOrder>44</BuildOrder>
+            <DependentOn>CLX.h</DependentOn>
+            <BuildOrder>14</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="ComLib.cpp">
+            <BuildOrder>31</BuildOrder>
+            <DependentOn>ComLib.h</DependentOn>
+            <BuildOrder>2</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="Comm.cpp">
+            <BuildOrder>26</BuildOrder>
+            <DependentOn>Comm.h</DependentOn>
+            <BuildOrder>10</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="ConvDef.cpp">
+            <BuildOrder>7</BuildOrder>
+            <Form>ConvDefDlg</Form>
+            <DependentOn>ConvDef.h</DependentOn>
+            <BuildOrder>23</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="country.cpp">
+            <BuildOrder>35</BuildOrder>
+            <DependentOn>country.h</DependentOn>
+            <BuildOrder>17</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="cradio.cpp">
+            <BuildOrder>4</BuildOrder>
+            <DependentOn>cradio.h</DependentOn>
+            <BuildOrder>32</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="ctnc.cpp">
+            <BuildOrder>29</BuildOrder>
+            <DependentOn>ctnc.h</DependentOn>
+            <BuildOrder>1</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="EditDlg.cpp">
+            <BuildOrder>41</BuildOrder>
+            <Form>EditDlgBox</Form>
+            <DependentOn>EditDlg.h</DependentOn>
+            <BuildOrder>11</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="Fft.cpp">
+            <BuildOrder>7</BuildOrder>
+            <DependentOn>Fft.h</DependentOn>
+            <BuildOrder>23</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="fir.cpp">
+            <BuildOrder>33</BuildOrder>
+            <DependentOn>fir.h</DependentOn>
+            <BuildOrder>3</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="FreqDisp.cpp">
+            <BuildOrder>38</BuildOrder>
+            <Form>FreqDispDlg</Form>
+            <DependentOn>FreqDisp.h</DependentOn>
+            <BuildOrder>20</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="Hamlog5.cpp">
+            <BuildOrder>42</BuildOrder>
+            <DependentOn>Hamlog5.h</DependentOn>
+            <BuildOrder>13</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="InputWin.cpp">
+            <BuildOrder>36</BuildOrder>
+            <Form>InputWinDlg</Form>
+            <DependentOn>InputWin.h</DependentOn>
+            <BuildOrder>19</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="LogConv.cpp">
+            <DependentOn>LogConv.h</DependentOn>
+            <BuildOrder>22</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="LogFile.cpp">
+            <BuildOrder>44</BuildOrder>
+            <DependentOn>LogFile.h</DependentOn>
+            <BuildOrder>14</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="Loglink.cpp">
+            <BuildOrder>37</BuildOrder>
+            <DependentOn>Loglink.h</DependentOn>
+            <BuildOrder>21</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="LogList.cpp">
+            <BuildOrder>43</BuildOrder>
+            <Form>LogListDlg</Form>
+            <DependentOn>LogList.h</DependentOn>
+            <BuildOrder>15</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="LogSet.cpp">
+            <BuildOrder>26</BuildOrder>
+            <Form>LogSetDlg</Form>
+            <DependentOn>LogSet.h</DependentOn>
+            <BuildOrder>10</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="MacroKey.cpp">
+            <BuildOrder>34</BuildOrder>
+            <Form>MacroKeyDlg</Form>
+            <DependentOn>MacroKey.h</DependentOn>
+            <BuildOrder>18</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="Main.cpp">
+            <BuildOrder>-1</BuildOrder>
+            <Form>MmttyWd</Form>
+            <DependentOn>Main.h</DependentOn>
+            <BuildOrder>1</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="mmcg.cpp">
+            <BuildOrder>34</BuildOrder>
+            <DependentOn>mmcg.h</DependentOn>
+            <BuildOrder>18</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="MmcgDlg.cpp">
+            <BuildOrder>36</BuildOrder>
+            <Form>MmcgDlgBox</Form>
+            <DependentOn>MmcgDlg.h</DependentOn>
+            <BuildOrder>19</BuildOrder>
+        </CppCompile>
+        <None Include="mml.h">
+            <BuildOrder>39</BuildOrder>
+            <BuildOrder>16</BuildOrder>
+        </None>
+        <CppCompile Include="MMlink.cpp">
+            <BuildOrder>38</BuildOrder>
+            <DependentOn>MMlink.h</DependentOn>
+            <BuildOrder>20</BuildOrder>
+        </CppCompile>
+        <None Include="mmrp.h">
+            <BuildOrder>40</BuildOrder>
+            <BuildOrder>12</BuildOrder>
+        </None>
+        <CppCompile Include="mmtty.cpp">
+            <BuildOrder>-1</BuildOrder>
+            <BuildOrder>0</BuildOrder>
+        </CppCompile>
+        <ResFiles Include="mmtty.res">
+            <BuildOrder>40</BuildOrder>
+            <BuildOrder>12</BuildOrder>
+        </ResFiles>
+        <None Include="mmw.h">
+            <BuildOrder>41</BuildOrder>
+            <BuildOrder>11</BuildOrder>
+        </None>
+        <CppCompile Include="Option.cpp">
+            <BuildOrder>9</BuildOrder>
+            <Form>OptionDlg</Form>
+            <DependentOn>Option.h</DependentOn>
+            <BuildOrder>27</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="PlayDlg.cpp">
+            <BuildOrder>6</BuildOrder>
+            <Form>PlayDlgBox</Form>
+            <DependentOn>PlayDlg.h</DependentOn>
+            <BuildOrder>24</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="QsoDlg.cpp">
+            <BuildOrder>39</BuildOrder>
+            <Form>QSODlgBox</Form>
+            <DependentOn>QsoDlg.h</DependentOn>
+            <BuildOrder>16</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="radioset.cpp">
+            <BuildOrder>33</BuildOrder>
+            <Form>RADIOSetDlg</Form>
+            <DependentOn>radioset.h</DependentOn>
+            <BuildOrder>3</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="Rtty.cpp">
+            <BuildOrder>5</BuildOrder>
+            <DependentOn>Rtty.h</DependentOn>
+            <BuildOrder>28</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="Scope.cpp">
+            <BuildOrder>8</BuildOrder>
+            <Form>TScope</Form>
+            <DependentOn>Scope.h</DependentOn>
+            <BuildOrder>25</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="SendFile.cpp">
+            <BuildOrder>31</BuildOrder>
+            <Form>SendFileDlg</Form>
+            <DependentOn>SendFile.h</DependentOn>
+            <BuildOrder>2</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="SetHelp.cpp">
+            <BuildOrder>5</BuildOrder>
+            <Form>SetHelpBox</Form>
+            <DependentOn>SetHelp.h</DependentOn>
+            <BuildOrder>28</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="ShortCut.cpp">
+            <BuildOrder>8</BuildOrder>
+            <Form>ShortCutDlg</Form>
+            <DependentOn>ShortCut.h</DependentOn>
+            <BuildOrder>25</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="Sound.cpp">
+            <BuildOrder>4</BuildOrder>
+            <DependentOn>Sound.h</DependentOn>
+            <BuildOrder>32</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="TextEdit.cpp">
+            <BuildOrder>42</BuildOrder>
+            <Form>TextEditDlg</Form>
+            <DependentOn>TextEdit.h</DependentOn>
+            <BuildOrder>13</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="TH5Len.cpp">
+            <BuildOrder>43</BuildOrder>
+            <Form>TH5LenDlg</Form>
+            <DependentOn>TH5Len.h</DependentOn>
+            <BuildOrder>15</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="TncSet.cpp">
+            <BuildOrder>30</BuildOrder>
+            <Form>TNCSetDlg</Form>
+            <DependentOn>TncSet.h</DependentOn>
+            <BuildOrder>0</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="TxdDlg.cpp">
+            <BuildOrder>35</BuildOrder>
+            <Form>TxdDlgBox</Form>
+            <DependentOn>TxdDlg.h</DependentOn>
+            <BuildOrder>17</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="VerDsp.cpp">
+            <BuildOrder>37</BuildOrder>
+            <Form>VerDspDlg</Form>
+            <DependentOn>VerDsp.h</DependentOn>
+            <BuildOrder>21</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="Wave.cpp">
+            <BuildOrder>6</BuildOrder>
+            <DependentOn>Wave.h</DependentOn>
+            <BuildOrder>24</BuildOrder>
+        </CppCompile>
+        <FormResources Include="PlayDlg.dfm"/>
+        <FormResources Include="Option.dfm"/>
+        <FormResources Include="QsoDlg.dfm"/>
+        <FormResources Include="radioset.dfm"/>
+        <FormResources Include="TncSet.dfm"/>
+        <FormResources Include="TH5Len.dfm"/>
+        <FormResources Include="TxdDlg.dfm"/>
+        <FormResources Include="VerDsp.dfm"/>
+        <FormResources Include="TextEdit.dfm"/>
+        <FormResources Include="SendFile.dfm"/>
+        <FormResources Include="Scope.dfm"/>
+        <FormResources Include="SetHelp.dfm"/>
+        <FormResources Include="ShortCut.dfm"/>
+        <FormResources Include="MmcgDlg.dfm"/>
+        <FormResources Include="EditDlg.dfm"/>
+        <FormResources Include="ClockAdj.dfm"/>
+        <FormResources Include="ConvDef.dfm"/>
+        <FormResources Include="LogSet.dfm"/>
+        <FormResources Include="LogList.dfm"/>
+        <FormResources Include="MacroKey.dfm"/>
+        <FormResources Include="Main.dfm"/>
+        <FormResources Include="FreqDisp.dfm"/>
+        <FormResources Include="InputWin.dfm"/>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <Import Condition="Exists('$(BDS)\Bin\CodeGear.Cpp.Targets')" Project="$(BDS)\Bin\CodeGear.Cpp.Targets"/>
+    <Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+    <ProjectExtensions>
+        <Borland.Personality>CPlusPlusBuilder.Personality.12</Borland.Personality>
+        <Borland.ProjectType>CppVCLApplication</Borland.ProjectType>
+        <BorlandProject>
+            <CPlusPlusBuilder.Personality>
+                <VersionInfo>
+                    <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+                    <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+                    <VersionInfo Name="MajorVer">1</VersionInfo>
+                    <VersionInfo Name="MinorVer">0</VersionInfo>
+                    <VersionInfo Name="Release">0</VersionInfo>
+                    <VersionInfo Name="Build">0</VersionInfo>
+                    <VersionInfo Name="Debug">False</VersionInfo>
+                    <VersionInfo Name="PreRelease">False</VersionInfo>
+                    <VersionInfo Name="Special">False</VersionInfo>
+                    <VersionInfo Name="Private">False</VersionInfo>
+                    <VersionInfo Name="DLL">False</VersionInfo>
+                    <VersionInfo Name="Locale">1041</VersionInfo>
+                    <VersionInfo Name="CodePage">932</VersionInfo>
+                </VersionInfo>
+                <VersionInfoKeys>
+                    <VersionInfoKeys Name="CompanyName"/>
+                    <VersionInfoKeys Name="FileDescription"/>
+                    <VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="InternalName"/>
+                    <VersionInfoKeys Name="LegalCopyright"/>
+                    <VersionInfoKeys Name="LegalTrademarks"/>
+                    <VersionInfoKeys Name="OriginalFilename"/>
+                    <VersionInfoKeys Name="ProductName"/>
+                    <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="Comments"/>
+                </VersionInfoKeys>
+                <ProjectProperties>
+                    <ProjectProperties Name="AutoShowDeps">False</ProjectProperties>
+                    <ProjectProperties Name="ManagePaths">True</ProjectProperties>
+                    <ProjectProperties Name="VerifyPackages">True</ProjectProperties>
+                </ProjectProperties>
+                <Source>
+                    <Source Name="MainSource">mmtty.cpp</Source>
+                </Source>
+                <Excluded_Packages/>
+            </CPlusPlusBuilder.Personality>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+</Project>

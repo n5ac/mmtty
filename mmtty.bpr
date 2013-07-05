@@ -1,0 +1,103 @@
+# ---------------------------------------------------------------------------
+VERSION = BCB.03
+# ---------------------------------------------------------------------------
+!ifndef BCB
+BCB = $(MAKEDIR)\..
+!endif
+# ---------------------------------------------------------------------------
+PROJECT = mmtty.exe
+OBJFILES = mmtty.obj Main.obj ComLib.obj fir.obj Sound.obj Rtty.obj Wave.obj Fft.obj \
+  Scope.obj Option.obj Comm.obj EditDlg.obj TextEdit.obj LogFile.obj LogList.obj \
+  QsoDlg.obj country.obj mmcg.obj MmcgDlg.obj FreqDisp.obj VerDsp.obj LogConv.obj \
+  ConvDef.obj PlayDlg.obj ShortCut.obj LogSet.obj ClockAdj.obj SetHelp.obj \
+  ctnc.obj TncSet.obj SendFile.obj cradio.obj radioset.obj MacroKey.obj \
+  TxdDlg.obj InputWin.obj Loglink.obj MMlink.obj Hamlog5.obj TH5Len.obj CLX.obj
+RESFILES = mmtty.res
+RESDEPEN = $(RESFILES) Main.dfm Scope.dfm Option.dfm EditDlg.dfm TextEdit.dfm LogList.dfm \
+  QsoDlg.dfm MmcgDlg.dfm FreqDisp.dfm VerDsp.dfm ConvDef.dfm PlayDlg.dfm \
+  ShortCut.dfm LogSet.dfm ClockAdj.dfm SetHelp.dfm TncSet.dfm SendFile.dfm \
+  radioset.dfm MacroKey.dfm TxdDlg.dfm InputWin.dfm TH5Len.dfm
+LIBFILES =
+LIBRARIES = vcldbx35.lib vcldb35.lib vclx35.lib vcl35.lib
+SPARELIBS = vcl35.lib vclx35.lib vcldb35.lib vcldbx35.lib
+PACKAGES = vclx35.bpi VCL35.bpi vcldb35.bpi vcldbx35.bpi bcbsmp35.bpi dclocx35.bpi \
+  Qrpt35.bpi teeui35.bpi teedb35.bpi tee35.bpi ibsmp35.bpi NMFast35.bpi \
+  inetdb35.bpi inet35.bpi
+PATHASM = .;
+PATHCPP = .;
+PATHPAS = .;
+PATHRC = .;
+DEBUGLIBPATH = $(BCB)\lib\debug
+RELEASELIBPATH = $(BCB)\lib\release
+DEFFILE =
+# ---------------------------------------------------------------------------
+CFLAG1 = -O2 -Hc -w -Ve -d -k- -vi -c -b- -w-par -w-inl -Vx
+CFLAG2 = -I$(BCB)\include;$(BCB)\include\vcl -H=$(BCB)\lib\vcl.csm
+CFLAG3 =
+PFLAGS = -AWinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE \
+  -U$(BCB)\lib\obj;$(BCB)\lib;$(RELEASELIBPATH) \
+  -I$(BCB)\include;$(BCB)\include\vcl -$L- -$D- -JPHNV -M
+RFLAGS = -i$(BCB)\include;$(BCB)\include\vcl
+AFLAGS = /i$(BCB)\include /i$(BCB)\include\vcl /mx /w2 /zn
+LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(RELEASELIBPATH) -aa -Tpe -x
+IFLAGS =
+LINKER = ilink32
+# ---------------------------------------------------------------------------
+ALLOBJ = c0w32.obj sysinit.obj $(OBJFILES)
+ALLRES = $(RESFILES)
+ALLLIB = $(LIBFILES) $(LIBRARIES) import32.lib cp32mt.lib
+# ---------------------------------------------------------------------------
+.autodepend
+
+!ifdef IDEOPTIONS
+
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1041
+CodePage=932
+
+[Debugging]
+DebugSourceDirs=
+
+[Parameters]
+RunParams=
+HostApplication=
+
+!endif
+
+$(PROJECT): $(OBJFILES) $(RESDEPEN) $(DEFFILE)
+    $(BCB)\BIN\$(LINKER) @&&!
+    $(LFLAGS) +
+    $(ALLOBJ), +
+    $(PROJECT),, +
+    $(ALLLIB), +
+    $(DEFFILE), +
+    $(ALLRES) 
+!
+
+.pas.hpp:
+    $(BCB)\BIN\dcc32 $(PFLAGS) { $** }
+
+.pas.obj:
+    $(BCB)\BIN\dcc32 $(PFLAGS) { $** }
+
+.cpp.obj:
+    $(BCB)\BIN\bcc32 $(CFLAG1) $(CFLAG2) -o$* $* 
+
+.c.obj:
+    $(BCB)\BIN\bcc32 $(CFLAG1) $(CFLAG2) -o$* $**
+
+.rc.res:
+    $(BCB)\BIN\brcc32 $(RFLAGS) $<
+#-----------------------------------------------------------------------------
+

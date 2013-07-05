@@ -1,0 +1,742 @@
+MMTTYのリモート機能
+(Please look at "Eremote.txt" if you want to read this in English)
+
+					2000.09.30 初版 JE3HHT  森　　誠
+					2010.09.21 改定 JE3HHT  森　　誠
+
+　本書には、あなたのプログラムからMMTTYを制御する方法を記載します。あなたはこの方法を使って、MMTTYのRTTYサウンドエンジンだけをあなたのアプリケーションから利用することができます。
+
+-- 改定履歴 -----------------------------------------------------
+スイッチ情報
+2010.09.21 起動タイムアウト時間を指定する起動オプションを追加
+2010.09.21 共有メモリの名前を指定する起動オプションを追加
+2010.09.19 スイッチ情報にDual Peak Filterを追加
+2010.09.16 RXM_PTTFSKの追加
+2003.01.30 TXM_SHOWSETUP, TXM_SHOWPROFILEの追加
+2003.01.28 RXM_ENBSHAREDの追加
+2003.01.28 -Z, -a 起動オプションを追加
+2003.01.23 RXM_ENBFOCUS, RXM_SETDEFFREQ, RXM_SETLENGTHの追加
+2002.07.02 TXM_RADIOFREQを追加
+2002.04.14 RXM_SHOWSETUPにアプリケーションの無効化スイッチを追加
+2000.02.11 共有メモリにProfileNames[]を追加(Ver1.61から)
+2000.02.11 TXM_DEFSHIFTを追加(Ver1.61から)
+2000.02.11 TXM_NOTCHを追加(Ver1.61から)
+2000.02.11 RXM_TIMERを追加(Ver1.61から)
+2000.01.05 共有メモリに変数を追加(Ver1.61から)
+2000.01.05 プロフィール機能の追加(Ver1.61から)
+2000.12.23 送信バッファクリアの追加(Ver1.61から)
+2000.12.13 キーボードバッファ経由で送信できる機能を追加(Ver1.60から)
+2000.11.26 -n起動オプションを追加(Ver1.60から)
+2000.11.10 -h起動オプションを追加(Ver1.60から)
+2000.11.08 共有メモリのtitleの配列のサイズの誤りを修正
+2000.11.08 Bob Furzer(K4CY)から提供されたVBサンプルコードを追加
+2000.11.08 RXM_NOTCHメッセージを追加(Ver1.59Aから)
+2000.11.08 スイッチ情報のNotch/LMSを追加(Ver1.59Aから)
+-----------------------------------------------------------------
+
+○はじめに
+~~~~~~~~~~
+　私は、多くの方からロギングやコンテストに関するE-Mailを受信しました。私の時間は限られているために、それらの方の要求を早急に満たすことは私の能力を超えていると考えました。
+
+　そこでMMTTYを他のプログラムから利用できるように、単なるモデムとする試みに取り組みました。まずTNCエミュレーションモードを追加しました。あなたは２台のパソコンをクロスケーブルで接続するか、または１台のパソコンの上でも、そこに仮想Ｃｏｍポートをインストールすれば、MMTTYをＴＮＣとして他のプログラムから利用できます。
+
+　しかし、２台のパソコンを必要とすることは、この機能の最大の弱点です。また１台のパソコン上で動作させる場合も３つ以上の物理Comポートが存在するか、または仮想Ｃｏｍポートをインストールしなければなりません。
+
+　そこで私は Bob Furzer (K4CY) に良いアイデアがないか相談しました。彼はすぐに単純なプロセス間メッセージ通信の方法を提案してくれました（Many Thanks to Bob）。
+　この方法を使うならば、Windowsレジストリに一切の登録を必要とせず、非常にスマートにアプリケーション間の通信を実現できます。私はさっそく彼のアイデアに沿ってMMTTYに単純なリモート機能を追加しました。
+
+  その後、Bobからの提案により、除々に機能を追加しました。あなたはこれらの全ての機能を自由に利用することができます。
+
+　なお本書はCプログラミングを例に解説してありますが、もちろんVisualBasicなど他の言語においても同等のAPI呼び出しを用いて、リモート機能を使用する事ができるはずです。
+
+
+○メッセージ値の取得とメッセージの送信
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+　MMTTYと通信するには、特別なメッセージ値を取得します。この方法を以下に示します。
+
+UINT MSG_MMTTY = ::RegisterWindowMessage("MMTTY");
+
+　以後あなたはMMTTYとの通信において、このメッセージ値を使わなければなりません。
+
+　MMTTYにメッセージを送信する場合、次のAPI関数を使用します。
+
+	BOOL PostMessage(hwnd, uMsg, wParam, lParam)
+
+	HWND hwnd;	/* 受け取り側のウィンドウのハンドル	*/ 
+	UINT uMsg;	/* ポストするメッセージ値	*/ 
+	WPARAM wParam;	/* 第1メッセージ パラメータ	*/ 
+	LPARAM lParam;	/* 第2メッセージ パラメータ	*/ 
+
+  例えばMMTTYを送信に切り替える場合は、
+
+	::PostMessage(MMTTY_Handle, MSG_MMTTY, RXM_PTT, 2);
+
+のように記述します。
+
+  またはあなたは
+
+	BOOL PostThreadMessage(dwThreadId, uMsg, wParam, lParam)
+	DWORD dwThreadId;	/* スレッドID	*/ 
+	UINT uMsg;	/* ポストするメッセージ	*/ 
+	WPARAM wParam;	/* メッセージの第1パラメータ	*/ 
+	LPARAM lParam;	/* メッセージの第2パラメータ	*/ 
+
+を使う事もできます。MMTTYはいずれの場合も正しくメッセージを受信する事ができます。ただし、MMTTYからあなたへのメッセージの送信は常にウインドウハンドルに対してのみ行われます。
+
+
+○MMTTYの起動方法
+~~~~~~~~~~~~~~~~~
+　あなたはMMTTYとの通信を行う場合、次の起動オプションによりMMTTYを起動しなければなりません。あなたのプログラム内からCreateProcess関数またはWinExec関数により起動するのが良いでしょう。
+
+MMTTY -r (-f)
+
+	-r : 操作ボタンあり、メニューあり
+	-s : 操作ボタンなし、メニューあり
+	-t : 操作ボタンなし、メニューなし
+	-u : 操作ボタンあり、メニューなし
+	-m : 常にアイコン化状態を保つ
+
+	(-f : マウス操作でサイズ変更不可)
+	(-d : マウス操作でサイズと位置変更不可)
+	(-hxxx... : ウインドウハンドルの指定 xxx=16進数)
+	(-n : BAUDOT符号変換を行わない）
+	(-p : Setup windowでCom設定を禁止)
+	(-Z : MMTTYの複数起動を許す)
+	(-a : MMTTYウインドウをStay on topにしない)
+	(-Cxxx : 共有メモリの名前, xxx=文字列)
+	(-Txxx : MMTTY起動時のタイムアウト, xxx=秒の１０進値) 
+
+　MMTTYは上記の４つ（-r, -s, -t, -u）のいずれかのオプションで起動されると、必ずコントロールパネルのみの表示になります。このパネルはあなたのプログラムの一部として見えるように常に前景ウインドウに保たれます。この状態ではMMTTYは送受のためのウインドウや、ログパネルを持ちません。
+
+  MMTTYはリモートモードで起動された場合、自身のウインドウの位置とサイズを必ずINIファイルに保持します。次回のリモート起動では常に前回と同じ位置、サイズで表示されるようになります。従ってあたなたは特別な場合を除き、MMTTYウインドウの位置やサイズを制御する必要はありません。
+
+　-fオプションを付加するとMMTTYはユーザのマウス操作でのウインドウサイズの変更を禁止します。もちろんこの場合、あなたはメッセージによりMMTTYのサイズを調整することがきでます。
+
+  -dオプションを付加するとMMTTYはタイトルバーを表示しません。この状態ではユーザによるマウス操作ではパネルの位置やサイズを一切変更できなくなります。つまりあなたのプログラムの都合の良い位置とサイズにパネルを常に固定する事ができ、MMTTYのパネルは、あなたのプログラムの一部のように見えるはずです。
+　しかしこのパネルの上にあなたのウインドウ（ポップアップメニューやダイアログボックス）を重ねる場合、そのウインドウのZ順序を最上位に調整するか、またはパネルの表示をOFFにする必要があります。
+  このオプションを付加された場合、MMTTYは画面の表示をOFFにした状態で起動します。あなたはMMTTYを適切な位置とサイズに設定した後、表示をONにしなければなりません。
+
+　-mオプションを付加するとMMTTYは常にアイコン化状態を維持します。MMTTYのコントロールパネルが、あなたのプログラムにとって邪魔になる場合はこのオプションを付加すれば良いでしょう。この場合あなたは共有メモリアクセスによりMMTTYからFFTおよびXYスコープのデータを取得しあなた自身でそれを表示することができます。
+
+  -hオプションを付加するとMMTTYは起動直後からあなたのウインドウハンドルが指定された値であると仮定し、HWND_BROADCASTを使わずにそのハンドルにメッセージを送信します。指定する値は16進数文字列でなければなりません。
+  HWND_BROADCASTメッセージが旨く受信できない場合、このオプションを使って起動すると良いでしょう。もちろんこの場合も、TXM_HANDLEメッセージを受信した時は、あなたのウインドウハンドルをMMTTYに通知しなければなりません。
+
+
+  これらの選択はあなたがMMTTYをどのように使うかによって決まります。本書では多くのメッセージや共有メモリについて解説しますが、もしあなたが-rオプションを使うならば、あなたは送受の切り替えと、文字を送受するメッセージだけを処理すれば良いはずです。
+　しかしあなたのプログラムでより自由度を得たいと思うならば、-tや-mオプションで起動し、より多くのメッセージを処理しなければなりません。
+
+
+○ウインドウハンドルの交換
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+　MMTTYはリモートオプションが付加されて起動されると、起動直後に自身のスレッド番号、ウインドウハンドルと初回起動情報を放送モードで送信します。
+
+	::PostMessage(HWND_BROADCAST, MSG_MMTTY, TXM_THREAD, MMTTY_ThreadId);
+	::PostMessage(HWND_BROADCAST, MSG_MMTTY, TXM_HANDLE, MMTTY_Handle);
+	::PostMessage(HWND_BROADCAST, MSG_MMTTY, TXM_START, 0x00000000);
+
+あなたはこのメッセージ(TXM_HANDLE)を受信したら、必ず自身のウインドウハンドルを以下のように送り返してください。
+
+	::PostMessage(MMTTY_Handle, MSG_MMTTY, RXM_HANDLE, Your_Handle);
+
+　MMTTYはこのメッセージを受信すると以後Your_Handleに対してのみメッセージを送信します。また起動された後、約５秒～１０秒経過してもこのメッセージが受信できない場合、MMTTYは自身を強制的に終了します。
+
+　あなたのプログラムでMMTTYからのメッセージを受信する仕掛けはお使いのコンパイラにより異なります。それぞれのマニュアルを参照して下さい。
+
+
+○MMTTYへのメッセージ
+~~~~~~~~~~~~~~~~~~~~~
+  wParamがメッセージ番号です。C言語のenum文は一番先頭で定義した値から順番に値がインクリメントされます。例えば以下の場合、RXM_PTTは0x0003が割り当てられます。
+
+enum {
+	RXM_HANDLE=0x0000,	// APP -> MMTTY
+	RXM_REQHANDLE,
+	RXM_EXIT,
+	RXM_PTT,
+	RXM_CHAR,
+
+	RXM_WINPOS,
+	RXM_WIDTH,
+	RXM_REQPARA,
+	RXM_SETBAUD,
+	RXM_SETMARK,
+
+	RXM_SETSPACE,
+	RXM_SETSWITCH,
+	RXM_SETHAM,
+	RXM_SHOWSETUP,
+	RXM_SETVIEW,
+
+	RXM_SETSQLVL,
+	RXM_SHOW,
+	RXM_SETFIG,
+	RXM_SETRESO,
+	RXM_SETLPF,
+
+	RXM_SETTXDELAY,
+	RXM_UPDATECOM,
+	RXM_SUSPEND,
+	RXM_NOTCH,
+	RXM_PROFILE,
+
+	RXM_TIMER,
+	RXM_ENBFOCUS,
+	RXM_SETDEFFREQ,
+	RXM_SETLENGTH,
+	RXM_ENBSHARED,
+
+	RXM_PTTFSK,
+};
+
+1.ウインドウハンドルの通知
+	wParam = RXM_HANDLE
+	lParam = あなたのウインドウハンドル
+
+　あなたは自身のウインドウハンドルを変更した際、必ずこのメッセージを送信しなければなりません。
+
+
+2.ウインドウハンドルの要求
+	wParam = RXM_REQHANDLE
+	lParam = 0x00000000
+
+　このメッセージは使用する必要はありません。
+
+
+3.MMTTYの終了
+	wParam = RXM_EXIT
+	lParam = 0x00000000
+
+　あなたはあなたのプログラムを終了する時、必ずこのメッセージを送信してMMTTYを終了しなければなりません。リモートモードのMMTTYは自分自身を終了させる操作を持ちません。
+
+
+4.送受の切り替え
+	wParam = RXM_PTT
+	lParam = 0x00000000	ただちに受信に切り替える
+	lParam = 0x00000001	送出後に受信に切り替える
+	lParam = 0x00000002	送信に切り替える
+	lParam = 0x00000004	送信バッファをクリアする
+
+5.文字の送信
+	wParam = RXM_CHAR
+	lParam = 文字コード（ASCII）
+
+　このメッセージはMMTTYが送信状態でないと有効ではありません
+
+  RXM_SETSWICHメッセージでB15に1に設定した場合、MMTTYは内部のキーボードバッファ経由で送信します。その場合、BSコードや送信方法(Char.out, Word out, Line out)、ワードラップ機能を使用することができます。
+
+  -nオプションを付加してMMTTYを起動した場合、BAUDOT符号変換は行われません。この場合lParamで指定するコードがそのまま送信されます。またRXM_SETSWICHメッセージのB15は無視されます。
+
+
+6.表示位置の変更
+	wParam = RXM_WINPOS
+	lParam = 上位16bit　Y座標（スクリーンピクセル値）
+		下位16bit　X座標（スクリーンピクセル値）
+
+7.パネルサイズの変更
+	wParam = RXM_WIDTH
+	lParam = 上位16bit 縦幅（スクリーンピクセル値）
+	lParam = 下位16bit 横幅（スクリーンピクセル値）
+
+8.動作パラメータの要求
+	wParam = RXM_REQPARA
+	lParam = 0
+
+
+　MMTTYはこのメッセージを受信すると、すべてのパラメータ情報を返送します。
+
+9.ボーレートの設定
+	wParam = RXM_SETBAUD
+	lParam = ボーレート値(x100)
+
+10.マーク周波数の設定
+	wParam = RXM_SETMARK
+	lParam = マーク周波数(Hz)
+
+11.スペース周波数の設定
+	wParam = RXM_SETSPACE
+	lParam = スペース周波数(Hz)
+
+12.スイッチ情報の設定
+	wParam = RXM_SETSWITCH
+	lParam = スイッチ情報（後述）
+
+13.ハムデフォルトの設定
+	wParam = RXM_SETHAM
+	lParam = 0x00000000
+
+14.セットアップウインドウの表示
+	wParam = RXM_SHOWSETUP
+	lParam = アプリケーションの無効化(0-OFF, 1-ON)
+
+　lParamが１の場合、セットアップウインドウが表示されている期間、呼び出し側アプリケーションを無効状態（マウスおよびキーイベントに応答できなくなる）にします。この動作はモーダルダイアログボックスに似ています。
+
+
+15.表示情報の設定
+	wParam = RXM_SETVIEW
+	lParam = 表示情報（後述）
+
+16.スケルチレベルの設定
+	wParam = RXM_SETSQLVL
+	lParam = スケルチレベル(0-1024)
+
+17.コントロールパネルの表示コントロール
+	wParam = RXM_SHOW
+	lParam = 0-OFF, 1-ON
+
+18.FIG/LTRの設定
+	wParam = RXM_SETFIG
+	lParam = 0-LTR, 1-FIG
+
+19.共振器パラメータの設定
+	wParam = RXM_SETRESO
+	lParam = 下位16bit IIRのBW値
+	lParam = 上位16bit FIRの次数
+
+20.積分器のパラメータの設定
+	wParam = RXM_SETLPF
+	lParam = 下位16bit FIRスムージングフィルタの周波数
+	lParam = 上位16bit IIR-LPFのカットオフ周波数
+
+21.送信ディレーの設定
+	wParam = RXM_SETTXDELAY
+	lParam = 0 - 10000 (ms)
+
+　送信ディレーを設定します。デフォルトは０です。
+
+　MMTTYはTX/RXの切り替えタイミングでTXM_PTTEVENTメッセージを送信します。あなたはこのメッセージを受信して、自分自身でPTTの切り替えを行うことができます。しかし例えばRadio Commandのように切り替えに若干の遅延が発生する場合、MMTTYの送信開始タイミングを少し遅らる必要が生じます。
+　この(RXM_SETTXDELAY)メッセージはこの用途のために存在します。
+
+22.共有メモリの更新通知
+	wParam = RXM_UPDATECOM
+	lParam = 0
+
+　MMTTYを起動後、共有メモリ内のcomName, comRadio, tilteのいずれかを変更したことをMMTTYに通知します。MMTTYはこのメッセージを受信すると、この３つのメンバーを再度自身に反映させます。
+
+
+23.サスペンド
+	wParam = RXM_SUSPEND
+	lParam = 0-Restore, 1-Suspend
+
+  lParamに１を設定した場合、MMTTYはサウンドカード、Comポートのリソースを解放して自身の表示を消します。
+  lParamに０を設定した場合、MMTTYはサウンドカード、Comポートのリソースを取得し自身の表示を復元します。（-mオプションで起動されている場合、MMTTYの表示はONになりません）
+
+  あなたがサウンドカードやComポートを自分自身で使用する場合、MMTTYを終了させるか、またはこのメッセージを使用してMMTTYをサスペンド状態にしなければなりません。
+
+24.ノッチ周波数の設定 (Ver1.59A以降で有効)
+	wParam = RXM_NOTCH
+	lParam = ノッチ周波数(Hz)
+
+25.プロフィールの記憶と呼び出し (Ver1.61以降で有効)
+	wParam = RXM_PROFILE
+	lParam = 上位16ﾋﾞｯﾄ  0-呼び出し, 1-記憶, 2-消去, 3-Load, 4-Save, 5-Assign
+	lParam = 下位16ﾋﾞｯﾄ  スロット番号(0 - 15)
+
+　記憶できるプロフィールは、デモジュレータ、デコーダ、モジュレータの状態です。
+
+呼び出し(lParam上位16bit=0)
+  指定したスロット番号のパラメータを呼び出し、MMTTYに設定します。プロファイルの名前は共有メモリProfileNames[x]で参照することができます。共有メモリを使用していない場合は名前を参照することはできません。
+
+記憶(lParam上位16bit=1)
+  現在のMMTTYのパラメータを指定したスロット番号に記憶します。プロファイルの名前は共有メモリのProfileNames[x]にあらかじめ設定しておかなければなりません。共有メモリを使用していない場合はMMTTYが適当な名前を割り当てます。
+
+消去(lParam上位16bit=2)
+  指定したスロット番号のパラメータを消去します。
+
+　すべてのプロフィールはUserPara.iniファイルに記憶されます。より詳しい使用方法については後述の「プロフィールの記憶と呼び出し」を参照して下さい。
+
+Load(lParam上位16bit=3)
+　ファイル選択ダイアログボックスを表示し、プロフィールを任意のファイルからロードします。
+
+Save(lParam上位16bit=4)
+　ファイル選択ダイアログボックスを表示し、プロフィールを任意のファイルにセーブします。
+
+Assign(lParam上位16bit=5)
+　プロファイル定義ダイアログボックスを表示し、プロフィールを登録します。
+
+26.PTTタイマーの設定 (Ver1.61以降で有効)
+	wParam = RXM_TIMER,
+	lParam = タイマー時間(s)
+
+　タイマー時間に０を設定するとタイマー機能はOFFになります。
+
+27.フォーカスチェンジの許可/不許可 (Ver1.63A以降で有効)
+	wParam = RXM_ENBFOCUS
+	lParam = 0-不許可, 1-許可
+
+  MMTTYがアプリケーションへのフォーカスチェンジを実行するかどうかを設定します。デフォルトは許可になっています。
+
+28.デフォルト周波数の設定 (Ver1.63B以降で有効)
+	wParam = RXM_SETDEFFREQ
+	lParam = 上位16ﾋﾞｯﾄ  デフォルトのシフト幅[Hz]
+	lParam = 下位16ﾋﾞｯﾄ  デフォルトのマーク周波数[Hz]
+
+  デフォルトのマーク周波数とシフト幅を設定します。MMTTYはHAMボタンが押された時、またはNET OFFで送信に切り替えた時、この周波数を参照します。
+
+29.ビット長の設定(Ver1.63B以降で有効)
+	wParam = RXM_SETLENGTH
+	lParam = ビット長(5, 6, 7, 8)
+  送受信符号のビット長を変更します。8bitを選択した場合でも、文字コードF0～FFまではMMTTY内の特別なコントロールで使用され透過されません。
+
+30.共有メモリ更新の許可/不許可(Ver1.64以降で有効)
+	wParam = RXM_ENBSHARED
+	lParam = 0-不許可, 1-許可
+
+  共有メモリの更新をするかどうかを設定します。デフォルトは許可になっています。
+
+31.PTTポートのFSK出力(Ver1.67B以降で有効)
+	wParam = RXM_PTTFSK
+	lParam = 0-NONE, 1-ON(+Sound), 2-ON
+
+  PTTポートからFSK信号を出力するかどうかを設定します。
+
+
+○MMTTYからのメッセージ
+~~~~~~~~~~~~~~~~~~~~~~
+  wParamがメッセージ番号です。C言語のenum文は一番先頭で定義した値から順番に値がインクリメントされます。例えば以下の場合、TXM_CHARは0x8003が割り当てられます。
+
+enum {
+	TXM_HANDLE=0x8000,	// MMTTY -> APP
+	TXM_REQHANDLE,
+	TXM_START,
+	TXM_CHAR,
+	TXM_PTTEVENT,
+
+	TXM_WIDTH,
+	TXM_BAUD,
+	TXM_MARK,
+	TXM_SPACE,
+	TXM_SWITCH,
+
+	TXM_VIEW,
+	TXM_LEVEL,
+	TXM_FIGEVENT,
+	TXM_RESO,
+	TXM_LPF,
+
+	TXM_THREAD,
+	TXM_PROFILE,
+	TXM_NOTCH,
+	TXM_DEFSHIFT,
+	TXM_RADIOFREQ,
+
+	TXM_SHOWSETUP,
+	TXM_SHOWPROFILE,
+};
+
+1.ウインドウハンドルの通知
+	wParam = TXM_HANDLE
+	lParam = MMTTYのウインドウハンドル
+
+　MMTTYは起動後、自身のウインドウハンドルを変更する可能性はありませんが、安全のために、あなたはこのメッセージを受信すると必ずMMTTYハンドル情報を上書きしなければなりません。
+
+2.ウインドウハンドルの要求
+	wParam = TXM_REQHANDLE
+	lParam = 0x00000000
+
+　このメッセージは現在使われていません。
+
+3.MMTTY開始情報
+	wParam = TXM_START
+	lParam = 0x00000000
+
+　MMTTYが最初起動された時に放送モード（HWND_BROADCAST）で送信されます。
+
+
+4.送受信文字
+	wParam = TXM_CHAR
+	lParam = 送受信文字（ASCII）
+
+　文字を受信（送信）する毎にこのメッセージが送信されます。
+
+  -nオプションを付加してMMTTYを起動した場合、BAUDOT符号変換は行われません。この場合受信（送信）したコードがそのままlParamに設定されます。
+
+
+5.送受変更イベント
+	wParam = TXM_PTTEVENT
+	lParam = 0x00000000 受信に切り替わった
+	lParam = 0x00000001 送信に切り替わった
+
+6.パネルサイズ情報
+	wParam = TXM_WIDTH
+	lParam = 上位16bit 縦幅（スクリーンピクセル値）
+	lParam = 下位16bit 横幅（スクリーンピクセル値）
+
+7.ボーレート情報
+	wParam = TXM_BAUD
+	lParam = ボーレート値(x100)
+
+8.マーク周波数情報
+	wParam = TXM_MARK
+	lParam = マーク周波数(Hz)
+
+9.スペース周波数情報
+	wParam = TXM_SPACE
+	lParam = スペース周波数(Hz)
+
+10.スイッチ情報
+	wParam = TXM_SWITCH
+	lParam = スイッチ情報(後述)
+
+11.表示情報
+	wParam = TXM_VIEW
+	lParam = 表示情報(後述)
+
+12.信号レベルの通知
+	wParam = TXM_LEVEL
+	lParam = 上位16bit　スケルチレベル(0-1024)
+	lParam = 下位16bit　信号レベル
+
+　あなたはこのメッセージによりレベルインディケータを作成できます。またMMTTYとの共有メモリを使用している場合、あなたはこのメッセージによりその更新イベントを同時に得る事もできます。
+
+13.シフト情報の通知
+	wParam = TXM_FIGEVENT
+	lParam = 0-LTR, 1-FIG
+
+14.共振器パラメータの通知
+	wParam = TXM_RESO
+	lParam = 下位16bit IIRのBW値
+	lParam = 上位16bit FIRの次数
+
+15.積分器のパラメータの通知
+	wParam = TXM_LPF
+	lParam = 下位16bit FIRスムージングフィルタの周波数
+	lParam = 上位16bit IIR-LPFのカットオフ周波数
+
+16.MMTTYのスレッドIDの通知
+	wParam = TXM_THREAD
+	lParam = スレッドID番号
+
+17.プロフィールの記憶と呼び出しの実行イベント (Ver1.61以降で有効)
+	wParam = TXM_PROFILE
+	lParam = 上位16ﾋﾞｯﾄ  0-呼び出し, 1-記憶, 2-消去
+	lParam = 下位16ﾋﾞｯﾄ  スロット番号(0 - 15)
+
+　プロフィールの呼び出し、記憶、消去が実行された時に発生するイベントです。
+
+18.ノッチ周波数情報 (Ver1.61以降で有効)
+	wParam = TXM_NOTCH
+	lParam = 上位16ﾋﾞｯﾄ  Notch1 周波数
+	lParam = 下位16ﾋﾞｯﾄ  Notch2 周波数
+
+19.HAMデフォルトシフト情報 (Ver1.61以降で有効)
+	wParam = TXM_DEFSHIFT
+	lParam = シフト周波数
+
+20.RadioCommandのVFOポーリング周波数 (Ver1.62C以降で有効)
+	wParam = TXM_RADIOFREQ
+	lParam = 周波数(KHz)
+
+21.セットアップウインドウの表示イベント
+	wParam = TXM_SHOWSETUP
+	lParam = 0-閉じた, 1-開いた
+
+22.プロファイルのロード/セーブウインドウの表示イベント
+	wParam = TXM_SHOWPROFILE
+	lParam = 0-閉じた, 1-開いた
+
+
+○lParamのビット定義
+~~~~~~~~~~~~~~~~~~~~
+
+スイッチ情報
+	b0-b1	モデムタイプ		0-IIR, 1-FIR, 2-PLL
+	b2	AFC
+	b3	NET
+	b4	ATC
+	b5	BPF
+	b6	LMS/Notch
+	b7	SQ
+	b8	Rev
+	b9	UOS
+	b10-b11	AFC時のシフトアルゴリズム
+	b12	積分器の方式		0-FIR, 1-IIR
+	b13	LMS/Notchの切り替え	0-LMS, 1-Notch
+	b14	0-single notch, 1-two notches
+	b15	RXM_CHARの処理	0-Key buffer OFF, 1-Key buffer ON
+	b16	Word warp(Key buffer ONの時)
+	b17-b18	Way to send(Key buffer ONの時) 0-Char, 1-Word, 2-Line
+	b19	Dual Peak Filter 0-OFF, 1-ON
+
+表示情報
+	b0-b2	FFT表示幅
+	b4-b5	FFTゲイン
+	b6-b7	FFT応答速度
+	b8	XYスコープのサイズ
+	b10-b11	XYスコープの品質
+	b12	XYスコープ表示
+	b13	FFTゲインのTestモード
+
+
+○共有メモリアクセス
+~~~~~~~~~~~~~~~~~~~~
+　MMTTYは、FFTおよびＸＹスコープの未処理のデータを、あなたのプログラムに引き渡すことができます。この機能を使うとあなたのプログラム内に、FFT表示やWaterfall、XYスコープ等を自由にデザインできます。
+　もしあなたがMMTTYのコントロールパネルをそのまま利用するのであれば、この機能を使用する必要は特にありません。
+
+　この機能を使用するには、あなたはMMTTYを起動する前に次の手続きを実行しなければなりません。
+
+#pragma pack(1)		// Enable pack of structer (VisualC++)
+#pragma option -a-	// Enable pack of structer (Borland C++Builder)
+typedef struct {
+	LONG	smpFreq;	// FFTの表示サンプリング周波数(->APP)
+	CHAR	title[128];	// コントロールパネルのタイトル(->MMTTY)
+	CHAR	comName[16];	// PTT/FSKのポート名(->MMTTY)
+	LONG	smpFFT;		// 0-11025Hz 1-8000Hzベース(->MMTTY)
+	LONG	flagFFT;	// FFT更新フラグ(MMTTY <-> APP)
+	LONG	arrayFFT[2048];	// FFT生データ(->APP)
+	LONG	flagXY;		// XY更新フラグ(MMTTY <-> APP)
+	LONG	arrayX[512];	// マーク信号の生データ(->APP)
+	LONG	arrayY[512];	// スペース信号の生データ(->APP)
+	CHAR	verMMTTY[16];	// MMTTYのバージョン番号(->APP)
+	CHAR	RadioName[16];	// RadioCommandのポート名(->MMTTY)
+	LONG	flagLostSound;	// サウンドを一部失った時に真(->APP)
+	LONG	flagOverflow;	// 入力が大き過ぎる時に真(->APP)
+	LONG	errorClock;	// (ppm) サウンドカードクロック補正値(->APP)
+	LONG	smpDemFreq;	// デモジュレータのサンプリング周波数(->APP)
+	LONG	TxBufCount;	// 送信バッファ内の未送信データ数(->APP)
+	CHAR	ProfileName[16][64];	// プロファイル名
+
+	LONG	dummy[2048];	// 予備領域
+}COMARRAY;
+#pragma pack()		// Disable pack of structer (VisualC++)
+#pragma option -a.	// Disable pack of structer (Borland C++Builder)
+
+  構造体のパックの指示はお使いのコンパイラで異なります。メンバー間にダミースペースが存在しないようにして下さい。もちろん全体をバイトやロングの１つの大きな配列として、オフセットによりアクセスする事もできます。
+
+　
+HANDLE	hMap;
+COMARRAY *pMap = NULL;
+hMap = ::CreateFileMapping(HANDLE(0xffffffff), NULL, PAGE_READWRITE,
+	0, sizeof(COMARRAY), "MMTTY");
+if( hMap != NULL ){
+	pMap = (COMARRAY *)::MapViewOfFile(hMap, FILE_MAP_WRITE,
+	 0, 0, 0);
+	if( pMap != NULL ){
+		memset(pMap, 0, sizeof(COMARRAY)); // fill memory by 0
+	}
+}
+
+  MMTTYはリモートモードで起動された場合、名前が"MMTTY"のプロセス間共有メモリをオープンする事を試みます。
+　この共有メモリのオープンに成功すると、MMTTYは共有メモリのtitleとcomNameを調べます。
+　titleメンバには、MMTTYのコントロールパネルのタイトルおよびWindowsタスクバーに表示させる文字列をASCIIZ文字列で指定します。このメンバがNULL文字列の場合、MMTTYはデフォルトのタイトルを使用します。
+　comNameメンバ, comRadioメンバには、MMTTYのPTT制御のポート名をASCIIZ文字列で指定します。このメンバがNULL文字列の場合、MMTTYはデフォルトのポート名（ユーザ設定による）を使用します。
+
+  MMTTYはcomNameとcomRadioが起動後、セットアップダイアログ操作により変更された場合、これらの共有メモリのメンバを更新します。
+
+　MMTTYは定期的にarrayFFTおよびarrayX, arrayYを更新し、TXM_LEVELメッセージを送信します。
+　この時、MMTTYはflagFFTが０の場合だけarrayFFTを更新し、flagFFTに１をセットします。また同様にflagXYが０の場合だけarrayX，arrayYを更新し、flagXYに１をセットします。TXM_LEVELメッセージはこれらのフラグの状態に関係なく、MMTTYの内部タイミングで必ず送信されます。
+
+　あなたはTXM_LEVELメッセージで更新イベントを得るか、または自分自身の定期的なタイマーイベントにより、これら情報を取得できます。その際、必ずflagFFT、flagXYがアクティブである事を確認して下さい。また継続してデータを得るために、これらの配列情報を利用した後、必ずflagFFTおよびflagXYを０にセットしなければなりません。
+
+  MMTTYは、あなたのプログラムの自由度を尊重するために、ここに格納するデータに関して多くの加工を行いません。
+
+  FFTの周波数分解能はMMTTYのサンプリング周波数に依存します。MMTTYのサンプリング周波数は共有メモリ内のsmpFreqメンバーによって表されます。初期値は11025Hzですが、ユーザ設定により微妙に変更される可能性があります。
+  FFTデータの振幅の最大値は２５６ですが、この値を若干上回ることがあり得ます。
+
+  もしあなたがFFTのサンプリング周波数に8000Hzベースを希望するならばsmpFFTメンバに１を設定して下さい。MMTTYは11025HzベースのFFTデータを、8000Hzベースのデータに変換して共有メモリに格納します。
+
+  XYデータは常に11025Hzベースサンプリングの半分の周波数により表されますが、この周波数そのものはあなたにとってはあまり意味を持たないはずです。
+　またこの振幅は、最大値が±16384を若干上回ることがあり得ます。
+
+　flagLostSoundメンバは、通常０ですが、サウンドカード処理が間に合わなかった時に０以外にセットされます。同様にflagOverflowメンバも、通常０ですが、サウンド入力が過大（最大の3/4を超えるとき）になった場合に０以外にセットされます。いずれもエラーが解消すると自動的に０に戻ります。
+　これらの状態を監視する場合は、TXM_LEVELメッセージのタイミングで捕まえるのが良いでしょう。
+
+　errorClockメンバーはユーザがセットアップ画面でサウンドカードのエラー補正を行った結果を、PPM表現に変換して、MMTTYの起動時に格納されます。同様に
+smpDemFreqメンバーはデモジュレータの実サンプリング周波数を表します。
+
+　txBufCountメンバーは、MMTTYの送信バッファ内の未送信のデータ数を保持します。このデータはTXM_LEVELメッセージのタイミングで取得するのが良いでしょう。
+
+
+○VBでの共有メモリアクセスサンプル By Bob Furzer K4CY
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  以下にVBから直接共有メモリをアクセスするサンプルコードを示します。このコードはBobが書いたものを参考にと送ってきてくれたものです(Thanks again Bob)。私はVBをまったく知らないので、すべてをそのまま掲載します。
+
+　このサンプルに関する質問をBobに送らないで下さい。また私も答えることができません。
+
+Global hMap As Long
+Global pMap As Long
+
+Type COMARRAY
+    smpFreq As Long        
+    title As String * 64    
+    comName As String * 8   
+    smpFFT As Long          
+    flagFFT As Long        
+    arrayFFT(2048) As Long  
+    flagXY As Long          
+    arrayX(512) As Long     
+    arrayY(512) As Long     
+    verMMTTY As String * 8  
+    dummy(2048) As Long                                    
+End Type
+
+Global SharedMemory As COMARRAY
+
+Private Sub Form_Load()
+    
+    Const PAGE_READWRITE = &H4
+    Const SECTION_ALL_ACCESS = &H1 Or &H2 Or &H4 Or &H8 Or &H10 Or &HF0000
+    
+    On Error Resume Next
+
+    MMTTY_MSG = RegisterWindowMessage("MMTTY")
+    hMap = CreateFileMapping(-1, ByVal 0&, &H4, 0&, 20672, "MMTTY")
+    If hMap <> 0 Then
+        pMap = MapViewOfFile(hMap, SECTION_ALL_ACCESS, 0, 0, 0)
+        If pMap <> 0 Then
+            ZeroMemory ByVal pMap, 20672
+
+            SharedMemory.title = "RTTY Engine" & Chr$(0)
+            SharedMemory.radioName = "NONE" & Chr$(0)
+            SharedMemory.comName = "NONE" & Chr$(0)
+            SharedMemory.smpFFT = 1
+            SharedMemory.flagFFT = 0
+                        
+            CopyMemory ByVal pMap + 4, ByVal SharedMemory.title, Len(SharedMemory.title)
+            CopyMemory ByVal pMap + 132, ByVal SharedMemory.radioName, Len(SharedMemory.radioName)
+            CopyMemory ByVal pMap + 12464, ByVal SharedMemory.comName, Len(SharedMemory.comName)
+            CopyMemory ByVal pMap + 148, VarPtr(SharedMemory.smpFFT), 4
+            CopyMemory ByVal pMap + 152, VarPtr(SharedMemory.flagFFT), 4
+
+            X& = Shell("mmtty -t -h" & Hex$(Me.hwnd))
+            MMTTYhWnd = FindWindow(vbNullString, SharedMemory.title)
+            Form1.Caption = Str$(MMTTYhWnd)
+        Else
+            X& = MsgBox("MapViewOfFile API Failed", vbOKOnly, "Catastrophic Error")
+        End If
+    Else
+        X& = MsgBox("CreateFileMapping API falied", vbOKOnly, "Catastrophic error")
+    End If
+End Sub
+
+Private Sub Form_Unload(Cancel As Integer)
+    If UnmapViewOfFile(pMap) <> 0 Then Call CloseHandle(hMap)
+    X = PostMessage(MMTTYhWnd, MMTTY_MSG, 0, 0)
+End Sub
+
+
+○セットアップダイアログボックス
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+　MMTTYは数多くのパラメータを持ちます。あなたはRXM_SHOWSETUPメッセージによりセットアップダイアログを表示させて、このセッティングのためのユーザインターフェースをユーザーに提供することができます。
+　あなたはこのダイアログボックスに不満を持つかも知れません。しかしこのダイアログボックスを使用している限り、MMTTYのデモジュレーターやモジュレーターの動作が将来修正された場合においても、あなたのプログラムに与える影響を最小限に抑えることができます。
+
+
+○プロフィールの記憶と呼び出し
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  MMTTYは数多くのパラメータを持ちます。しかし実際の運用時にセットアップダイアログボックスを開いてそれらを変更するのは若干不便さがあります。
+  そこでVer1.60Bからはプロフィールメニューを追加し、ユーザがパラメータセットを一括して自由に記憶・呼び出しを行えるようにしました。ここに記憶されるのはデモジュレータ、デコーダ、モジュレータのパラメータに限られます。
+
+　スタンドアロンのMMTTYは８個のプロフィールメニュースロットを持ちますが、リモートモードではスロット0～スロット15まで最大１６個までのプロフィールスロットを使用できます。スロット0～スロット7はMMTTYのメニューで扱われるのと共通です。
+
+　パラメータは「UserPara.ini」ファイルにスロット0～スロット15が、Define0～Define15までのエントリとして記憶されます。
+　この機能の他の利用方法として、アプリケーションはINIファイルの一部のパラメータを直接書き換えた後に、RXM_PROFILEメッセージをMMTTYに送信し、特定のパラメータを任意に変更することもできます。その場合はスロット15（Define15）をテンポラリのスロットとして使うことをお勧めします。
+
+　もしあなたがパラメータセットに特別な提案（例えばフラッターやマルチパスに有効なパラメータ）を持つならば、そのパラメータを記憶したUserPara.iniファイルを、あなたの配布ファイルに含めて、ユーザにその機能を提供することは良い考えです。その際、変更したくない個々のパラメータについては、単にそのパラメータ定義行をUserPara.iniからエディタで削除しておけばOKです。
+
+  MMTTYがプロフィールを記録する際、UserPara.ini内で管理するプロフィールの名前（Name=）は、共有メモリを使用していない場合は自動的に"Remote 1"～"Remote 16"の名前が割り当てられます。あなたのプログラム内で別の名前を定義する場合はUserPara.ini内に特別なエントリ（例えば RemoteName=）を作成し、そこに記録するようにすれば良いでしょう。MMTTYはあなたが追加したエントリの内容を変更しません。
+
+
+○その他
+~~~~~~~~
+　リモートモードは、MMTTY.EXEのみでも起動することができます。あなたが無料ソフトを配布する場合、もし必要ならばMMTTY.EXEをあなたのパッケージに含めることを禁止しません。その場合、私（JE3HHT）への連絡は一切必要ありません。どうぞ自由にやって下さい。あなたのプログラムの幸運を祈ります。
+
+73, Mako - JE3HHT
+

@@ -1,0 +1,779 @@
+Remote control mode of MMTTY
+				Written on September 30, 2000
+				Lastly updated on September 21, 2010
+				By JE3HHT Makoto Mori
+				Translated into English by JA7UDE Nobuyuki Oba
+
+ This document describes how to utilize the MMTTY remote mode.  With this mode, you can make use of the RTTY engine of the MMTTY from your program.
+
+================
+Revision history
+================
+
+2010.09.21 Added a start-up option that specifies the startup time limit
+2010.09.21 Added a start-up option that specifies the shared memory name
+2010.09.19 Added Dual Peak Filter on/off property to the switch information
+2010.09.16 Added RXM_PTTFSK
+2003.01.30 Added TXM_SHOWSETUP, TXM_SHOWPROFILE
+2003.01.28 Added RXM_ENBSHARED
+2003.01.28 Added -Z, -a start-up options
+January 23, 2003 - Added RXM_ENBFOCUS, RXM_SETDEFFREQ, RXM_SETLENGTH
+July 2, 2002 - Added TXM_RADIOFREQ
+April 14, 2002 - Added the application disable option to RXM_SHOWSETUP
+February 11, 2001 - Added ProfileNames[] into the shared memory (version 1.61 or later)
+February 11, 2001 - Added TXM_DEFSHIFT (version 1.61 or later)
+February 11, 2001 - Added TXM_NOTCH (version 1.61 or later)
+February 11, 2001 - Added RXM_TIMER (version 1.61 or later)
+January 5, 2001 - Added the profile function and the variables in the shared memory (version 1.61 or later)
+December 23, 2000 - Added the abort function call to immediately clear the TX buffer
+December 13, 2000 - Added the transmission mode through the keyboard buffer
+November 26, 2000 - Added -n option (since version 1.60)
+November 10, 2000 - Added -h option (since version 1.60)
+November 08, 2000 - Corrected the size of the title array in the shared memory
+November 08, 2000 - Added a VB sample code offered by Bob Furzer K4CY
+November 08, 2000 - Added RXM_NOTCH message (since version 1.59a)
+November 08, 2000 - Added Notch/LMS switch information (since version 1.59a)
+
+
+============
+Introduction
+============
+ I have been receiving many emails concerning about the logging and contest utilities of MMTTY.  I am afraid I won't be able to accommodate all the requests in my limited time.
+
+ For this reason, I added the TNC emulation mode, which makes the PC running MMTTY act as a TNC.  You can control the PC as a TNC by connecting to another PC with a null modem cable.  This emulation mode, however, requires two PCs or one PC with three COM ports; it is not a smart implementation.
+
+ I asked Bob Furzer, K4CY, for any good idea.  He has quickly proposed a method using a simple inter-process communication (many thanks to Bob). 
+
+ This method makes it possible that MMTTY can easily communicate with other applications without using Windows registry.  Based on his idea, I added a remote control mode to MMTTY.
+
+ According to the discussion with Bob, I have incrementally added various functions to the mode.  You can make full use of these functions by using Windows messages.
+
+ Although I explain the usage of the functions in C, you can use other languages such as Visual Basic because the API should be the same.
+
+=============================
+Receive and transmit messages
+=============================
+ To communicate with MMTTY, you at first get a special message by
+
+UINT MSG_MMTTY = ::RegisterWindowMessage("MMTTY");
+
+From now on, you are going to use this message value.
+
+ To send a message to MMTTY, use the following API function.
+
+	BOOL PostMessage(hwnd, uMsg, wParam, lParam)
+	HWND hwnd;	// The handle of the receiver window
+	UINT uMsg;	// The message to post 
+	WPARAM wParam;	// The first parameter of the message 
+	LPARAM lParam;	// The second parameter of the message
+
+ To make MMTTY switch to TX, for example, you will send the following message.
+
+	::PostMessage(MMTTY_Handle, MSG_MMTTY, RXM_PTT, 2);
+
+You can use the following alternative scheme.
+
+	BOOL PostThreadMessage(dwThreadId, uMsg, wParam, lParam)
+	DWORD dwThreadId;	// Thread ID 
+	UINT uMsg;		// Message to post 
+	WPARAM wParam;		// The first parameter of the message 
+	LPARAM lParam;		// The second parameter of the message 
+
+ MMTTY accepts both methods.  It should be noted, however, that MMTTY always sends a message to your window handle.
+
+==================
+How to start MMTTY
+==================
+ To communicate with MMTTY, you have to start MMTTY with an option.  It is a good idea to start MMTTY by using the CreateProcess or WinExec function.
+
+MMTTY options
+
+Available options are:
+
+Option	Button	Menu
+-t	No	No
+ FFT spectrum, Waterfall, and XY scope are displayed.
+	e.g. MMTTY -t
+
+Option	Button	Menu
+-s	No 	Yes
+ Control menus are displayed in addition to the above components.
+	e.g. MMTTY -s
+
+Option	Button	Menu
+-u	Yes	No
+ Control buttons are displayed.
+	e.g. MMTTY -u
+
+Option	Button	Menu
+-r	Yes	Yes
+ Control menus are also displayed in addition to the above components.
+	e.g. MMTTY -r
+
+Option
+-f
+ The user cannot change the MMTTY window size with a mouse; still you can change the size by using a message.
+	e.g. MMTTY -r -f
+
+Option
+-d
+ The MMTTY window does not have a title bar, and therefore, the user cannot change the MMTTY window size and location with a mouse.  You can involve the MMTTY window as a control panel in your application window.  It should be noted that, if you want to display your windows, such as a pop-up menu and a dialog box, you should keep them on the top of the Z order or turn off the MMTTY window.  This option starts MMTTY with turning the MMTTY display off.  You have to set the size and location of the MMTTY window and then turn its display on.
+	e.g. MMTTY -t -d
+
+Option
+-m
+ MMTTY is iconized.  This option is useful when you want to hide the MMTTY window.  You can obtain the information on the FFT spectrum and XY scope through the shared memory.
+	e.g. MMTTY -m
+
+
+Option
+-hxxx...
+ xxx is a Window handle in hexadecimal.  When you invoke MMTTY with -h option, MMTTY assumes xxx is the Window handle of your program and sends messages to it without using HWND_BORADCAST.  xxx must be in hex.  In case you cannot receive HWND_BROADCAST messages, you should use this option.  Even with this option, you must notify MMTTY your Window handle when you receive TXM_HANDLE message from MMTTY.
+
+Option
+-n
+MMTTY does not translate the received characters to the BAUDOT code.
+
+Option
+-p
+MMTTY does not allow users to change the COM setting in the setup window.
+
+option
+-Z
+ This option allows two or more MMTTY instances running simultaneously
+	e.g. MMTTY -m -Z
+option
+-a
+ This option disables the stay-on-top attribute of the MMTTY window.
+
+option
+-Cxxx
+This option specifies the name of the shared memory. xxx = shared memory name string.
+
+option
+-Txxx
+This option specifies the startup time limit. xxx = seconds in decimal.
+
+ When MMTTY is invoked with one of these options (-r, -s, -t, -u), it displays the control panel only.  The panel is always placed on the top of the window so that you can view it as a part of your program.  The panel does not have a window for receive/transmission or logging.
+
+ MMTTY memorizes the window size and position in the MMTTY.INI file.  Therefore, you will have the same window size and position when you start MMTTY again, and you do not have to control them.
+
+ The choice of the options is on you.  I am going to explain the usage of messages and shared memory, but if you use -r option, you will only have to control TX/RX and character send/receive. If, however, you want to have more flexibility, use -t or -m option.
+
+
+=======================
+Exchange window handles
+=======================
+ When MMTTY is invoked with a remote option, it sends the thread ID, window handle and the information on first-time invocation in the broadcast mode.
+
+	::PostMessage(HWND_BROADCAST, MSG_MMTTY, TXM_THREAD, MMTTY_ThreadId);
+	::PostMessage(HWND_BROADCAST, MSG_MMTTY, TXM_HANDLE, MMTTY_Handle);
+	::PostMessage(HWND_BROADCAST, MSG_MMTTY, TXM_START, 0x00000000);
+
+ When you receive the message (TXM_HANDLE), you must send the window handle of your program back to MMTTY by
+
+	::PostMessage(MMTTY_Handle, MSG_MMTTY, TXM_HANDLE, Your_Handle);
+
+ After receiving this message, MMTTY sends the messages only to Your_Handle.  If MMTTY does not receive your message for 5 to 10 seconds, it automatically terminates itself.
+
+ The method of receiving messages is dependent on a Compiler.  Refer to the manual of your environment.
+
+
+=================
+Messages to MMTTY
+=================
+ wParam is the message number.  In C, each parameter is sequentially assigned a number.  In the following example, 0x0003 is assigned to RXM_PTT.
+
+enum {
+	RXM_HANDLE=0x0000,	// APP -> MMTTY
+	RXM_REQHANDLE,
+	RXM_EXIT,
+	RXM_PTT,
+	RXM_CHAR,
+
+	RXM_WINPOS,
+	RXM_WIDTH,
+	RXM_REQPARA,
+	RXM_SETBAUD,
+	RXM_SETMARK,
+
+	RXM_SETSPACE,
+	RXM_SETSWITCH,
+	RXM_SETHAM,
+	RXM_SHOWSETUP,
+	RXM_SETVIEW,
+
+	RXM_SETSQLVL,
+	RXM_SHOW,
+	RXM_SETFIG,
+	RXM_SETRESO,
+	RXM_SETLPF
+
+	RXM_SETTXDELAY,
+	RXM_UPDATECOM,
+	RXM_SUSPEND,
+	RXM_NOTCH,
+	RXM_PROFILE,
+
+	RXM_TIMER,
+	RXM_ENBFOCUS,
+	RXM_SETDEFFREQ,
+	RXM_SETLENGTH,
+	RXM_ENBSHARED,
+
+	RXM_PTTFSK,
+};
+
+1. Notification of the window handle
+	wParam = RXM_HANDLE
+	lParam = Your window handle
+
+ When you change your window handle, you must send this message.
+
+2. Request of the window handle - you do not have to use this message.
+	wParam = RXM_REQHANDLE
+	lParam = 0x00000000
+
+3. Termination of MMTTY
+	wParam = RXM_EXIT
+	lParam = 0x00000000
+
+ When you terminate your program, you must send this message to terminate MMTTY as well.  MMTTY in the remote mode does not have any way to terminate itself.
+
+4. Switch TX/RX
+	wParam = RXM_PTT
+	lParam = 0x00000000	Switch to RX immediately
+	lParam = 0x00000001	Switch to RX after the transmission is completed
+	lParam = 0x00000002	Switch to TX
+	lParam = 0x00000004	Clear the TX buffer
+
+5. Send character
+	wParam = RXM_CHAR
+	lParam = Character code (ASCII)
+	This message functions only when MMTTY is in TX.
+
+When Bit 15 of the RXM_SETSWITCH message is 1, MMTTY uses the internal keyboard buffer for sending characters.  With the keyboard buffer, you can use the BS code, the transmission buffering (i.e., Character out, Word out, or Line out), and the word-wrap function.
+If MMTTY is started with -n option, MMTTY does not perform the ASCII-BAUDOT translation.  MMTTY sends the character specified in lParam "as is."  In this case, Bit 15 of the RXM_SETSWITCH is ignored.
+
+6. Move the display position
+	wParam = RXM_WINPOS
+	lParam (upper 16 bits) = Y-axis position (screen pixel value)
+	lParam (lower 16 bits) = X-axis position (screen pixel value)
+
+7. Resize the display width
+	wParam = RXM_WIDTH
+	lParam (upper 16 bits) = Display height (screen pixel value)
+	lParam (lower 16 bits) = Display width (screen pixel value)
+
+8. Request of parameters
+	wParam = RXM_REQPARA
+	lParam = 0
+
+ In response to this message, MMTTY sends back all the current parameters.
+
+9. Setting of baud rate
+	wParam = RXM_SETBAUD
+	lParam = Baud rate
+
+ The real baud rate is given by multiplying 0.01 to this value; if lParam=4545 then baud_rate =45.45 for instance
+
+10. Mark frequency
+	wParam = RXM_SETMARK
+	lParam = Mark frequency (Hz)
+
+11. Space frequency
+	wParam = RXM_SETSPACE
+	lParam = Space frequency (Hz)
+
+12. Switch information (see below for details)
+	wParam = RXM_SETSWITCH
+	lParam = Switch information
+
+13. Set the HAM default
+	wParam = RXM_SETHAM
+	lParam = 0x00000000
+
+14. Display of the setup window
+	wParam = RXM_SHOWSETUP
+	lParam = Disable application (0-OFF, 1-ON)
+
+	If lParam is 1, the calling application does not respond to the keyboard or mouse when the setup window is shown.  This is similar to the modal dialog box.
+
+15. Set of the display information (see below for details)
+	wParam = RXM_SETVIEW
+	lParam = Display information
+
+16. Squelch level
+	wParam = RXM_SETSQLVL
+	lParam = squelch level(0-1024)
+
+17. Display of the control panel (on/off)
+	wParam = RXM_SHOW
+	lParam = 0-OFF, 1-ON
+
+18. Setting of FIG/LTR
+	wParam = RXM_SETFIG
+	lParam = 0-LTR, 1-FIG
+
+19. Parameters of the resonator
+	wParam = RXM_SETRESO
+	lParam (lower 16 bits) = IIR BW
+	lParam (upper 16 bits) = FIR order
+
+20. Parameters of the integrator
+	wParam = RXM_SETLPF
+	lParam (lower 16 bits) = FIR smoothing filter frequency
+	lParam (upper 16 bits) = IIR-LPF cut-off frequency
+
+21. Transmission delay - default is 0 msec.
+	wParam = RXM_SETTXDELAY
+	lParam = 0 - 10000 (msec)
+
+ MMTTY sends the TXM_PTTEVENT message at the timing of TX/RX switching.  You can switch TX/RX PTT by receiving this message.  However, you will have to delay the transmission if you have a time lag in switching.  This delay could happen if you use the radio command.
+
+22. Notification of shared memory update
+	wParam = RXM_UPDATECOM
+	lParam = 0
+
+ You send this message to MMTTY when you change comName, comRadio, or title.  Upon receiving this message, MMTTY updates these three members.
+
+23. Suspend
+	wParam = RXM_SUSPEND
+	lParam = 0 - restore, 1 - suspend
+
+ lParam = 1: MMTTY releases the resources of the sound card and COM port, and hides itself.  lParam = 0: MMTTY obtains the resources of the sound card and COM Port, and unhides itself.
+ Note that MMTTY will not unhide itself if it is started with the -m option.  In case you use the sound card or the COM port by yourself, use this message to suspend MMTTY or terminate MMTTY.
+
+24. Notch (effective in version 1.59a or later)
+	wParam = RXM_NOTCH
+	lParam = Notch frequency (Hz)
+
+25. Save and load the profile (effective in version 1.61 or later)
+	wParam = RXM_PROFILE
+	lParam (lower 16 bits) = Slot number
+	lParam (upper 16 bits) = 0-Retrieve, 1-Store, 2-Delete, 3-Load, 4-Save, 5-Assign
+ 
+ You can store the states of the demodulator, decoder, and modulator as the profile.
+
+Retrieve (upper 16 bits of lParam is 0)
+	Retrieve the profile from the specified slot.
+	The name of the profile can be referred to by the shared memory ProfileNames[x].  When you do not use the shared memory, you cannot refer to the name.
+
+
+Store (upper 16 bits of lParam is 1)
+	Store the profile into the specified slot.
+	The name of the profile must be preassigned to the ProfileNames[x] of the shared memory.  When you do not use the shared memory, MMTTY assigns an appropriate name to it.
+
+
+Delete (upper 16 bits of lParam is 2)
+	Delete the profile in the specified slot.
+
+ All the profile data are saved into UserPara.ini.  For details, refer to "Store and Retrieve the Profile" in the later section of this document.
+
+Load (upper 16 bits of lParam is 3)
+	Display the file selection dialog box and load the profile from a file.
+
+Save (upper 16 bits of lParam is 4)
+	Display the file selection dialog box and save the profile to a file.
+
+Assign (upper 16 bits of lParam is 5)
+	Display the profile definition dialog box and register the profile.
+
+
+ It should be noted that you should not use Load/Save if the application is in the state of AlwaysStayOnTop.  It is because the file selection dialog box might be hidden behind the application's window.
+
+
+26. PTT timer (available version 1.61 or later)
+	wParam = RXM_TIMER,
+	lParam = Timer time (second)
+
+	To turn PTT timer off, put 0 to the Timer time.
+
+27. Focus change enable/disable (effective in version 1.63A or later)
+	wParam = RXM_ENBFOCUS
+	lParam = 0-disable, 1-enable
+
+	This parameter enables and disables the focus change driven by MMTTY.  The default is "enable."
+
+28. Default frequency (effective in version 1.63B or later)
+	wParam = RXM_SETDEFFREQ
+	lParam = Upper 16 bits  Default shift width [Hz]
+	lParam = Lower 16 bits  Default mark frequency [Hz]
+
+	These parameters specify the default mark frequency and shift width.  MMTTY uses these values when the HAM button is depressed or when it is switched to TX with NET OFF.
+
+29. Bit length (effective in version 1.63B or later)
+	wParam = RXM_SETLENGTH
+	lParam = Bit length (5, 6, 7, 8)
+
+	This parameter specifies the bit length of the TX code.  Even if 8 bit is selected, code between 0xF0 and 0xFF are used by MMTTY and therefore not transmitted.
+
+30. Enable/disable the shared memory update (effective in version 1.64 or later)
+	wParam = RXM_ENBSHARED
+	lParam = 0-disable, 1-enable
+
+	This parameter enables or disables the update operation to the shared memory.  The default is Enabled.
+
+31. FSK keying via a PTT (Ver1.67B or later)
+	wParam = RXM_PTTFSK
+	lParam = 0-NONE, 1-ON(+Sound), 2-ON
+
+	This parameter selects the PTT FSK keying. 0 for AFSK only, 1 for AFSK+FSK, 2 for FSK
+
+===================
+Messages from MMTTY
+===================
+ wParam is the message number.  In C language, each parameter is assigned a number sequentially .  In the following example, 0x8003 is assigned to TXM_CHAR.
+
+enum {
+	TXM_HANDLE=0x8000,	// MMTTY -> APP
+	TXM_REQHANDLE,
+	TXM_START,
+	TXM_CHAR,
+	TXM_PTTEVENT,
+
+	TXM_WIDTH,
+	TXM_BAUD,
+	TXM_MARK,
+	TXM_SPACE,
+	TXM_SWITCH,
+
+	TXM_VIEW,
+	TXM_LEVEL,
+	TXM_FIGEVENT,
+	TXM_RESO,
+	TXM_LPF,
+
+	TXM_THREAD
+	TXM_PROFILE,
+	TXM_NOTCH,
+	TXM_DEFSHIFT,
+	TXM_RADIOFREQ,
+
+	TXM_SHOWSETUP,
+	TXM_SHOWPROFILE,
+};
+
+1. Notification of the window handle
+	wParam = TXM_HANDLE
+	lParam = MMTTY window handle
+
+ MMTTY never changes its window handle but you must overwrite the MMTTY window handle if you receive this message just for sure.
+
+2. Request of the window handle - this message is not in use now.
+	wParam = TXM_REQHANDLE
+	lParam = 0x00000000
+
+3. MMTTYstart information
+	wParam = TXM_START
+	lParam = 0x00000000
+
+ When MMTTY is executed for the first time, it sends this message in the broadcast mode (HWND_BROADCAST).
+
+4.  Receive/transmit character
+	wParam = TXM_CHAR
+	lParam = Receive/transmit character (ASCII)
+If MMTTY is started with -n option, MMTTY does not perform the ASCII-BAUDOT translation.  MMTTY puts the received/transmitted character to lParam "as is."
+
+ Every time MMTTY receives or transmits a character, it sends this message.
+
+5. Event notification of TX/RX switching
+	wParam = TXM_PTTEVENT
+	lParam = 0x00000000 MMTTY switches to RX
+	lParam = 0x00000001 MMTTY switches to TX
+
+6. Display height
+	wParam = TXM_WIDTH
+	lParam (upper 16 bits) = Display height (screen pixel value)
+	lParam (lower 16 bits) = Display width (screen pixel value)
+
+7. Baud rate
+	wParam = TXM_BAUD
+	lParam = Baud rate ( x 100 )
+	(45.45[boo], lParam = 4545)
+
+8. Mark frequency
+	wParam = TXM_MARK
+	lParam = Mark frequency (Hz)
+
+9. Space frequency
+	wParam = TXM_SPACE
+	lParam = Space frequency (Hz)
+
+10. Switch information (see below for details)
+	wParam = TXM_SWITCH
+	lParam = Switch information
+
+11.  Display information (see below for details)
+	wParam = TXM_VIEW
+	lParam = Display information
+
+12. Signal level
+	wParam = TXM_LEVEL
+	lParam (upper 16 bits) = squelch level (0-1024)
+	lParam (lower 16 bits) = signal level
+
+ You can use this message to make an indicator.  When you use a shared memory with MMTTY, you are notified the update event by this message.
+
+13. Notification of the shift state
+	wParam = TXM_FIGEVENT
+	lParam = 0-LTR, 1-FIG
+
+14. Parameters of the resonator 
+	wParam = TXM_RESO
+	lParam (upper 16 bits) = IIR BW
+	lParam (lower 16 bits) = FIR order
+
+15. Parameters of the integrator
+	wParam = TXM_LPF
+	lParam (upper 16 bits) = FIR smoothing filter frequency
+	lParam (lower 16 bits) = IIR LPF cut-off frequency
+
+16. MMTTY thread ID
+	wParam = TXM_THREAD
+	lParam = thread ID
+
+17. Profile retrieving and storing (effective in version 1.61 or later)
+	wParam = TXM_PROFILE
+	lParam (upper 16 bits) = 0-Retrieve, 1-Store, 2-Delete
+	lParam (lower 16 bits = Slot number
+
+This event occurs when the profile is retrieved, stored, or deleted.
+
+18. Notch frequency (available in version 1.61 or later)
+	wParam = TXM_NOTCH
+	lParam (upper 16 bits) = Notch 1 frequency
+	lParam (lower 16 bits9 = Notch 2 frequency
+
+19. HAM default shift (available in version 1.61 or later )
+	wParam = TXM_DEFSHIFT
+	lParam = shift frequency
+
+20. VFO polling frequency of RadioCommand (effective in version 1.62C or later)
+	wParam = TXM_RADIOFREQ
+	lParam = Frequency (KHz)
+
+21. Notification of the event of the setup window
+	wParam = TXM_SHOWSETUP
+	lParam = 0-closed, 1-opened
+
+22. Notification of the event of the profile load/save window
+	wParam = TXM_SHOWPROFILE
+	lParam = 0-closed, 1-opened
+
+
+================================================
+Bit definition of Switch and Display information
+================================================
+[lParam of the switch information]
+	b0-b1		Demodulator type	0-IIR, 1-FIR, 2-PLL
+	b2		AFC
+	b3		NET
+	b4		ATC
+	b5		BPF
+	b6		LMS/Notch
+	b7		SQ
+	b8		Rev
+	b9		UOS
+	b10-b11	AFC shift algorithm
+	b12		Integrator type	0-FIR, 1-IIR
+	b13		LMS or Notch		0-LMS, 1-Notch
+	b14		0-single notch, 1-two notches
+	b15		RXM_CHAR method	0-Key buffer OFF, 1-Key buffer ON
+	b16		Word wrap (effective only when the keyboard buffer is ON)
+	b17-b18		Way to send  (effective only when the keyboard buffer is ON)
+			 0-Char, 1-Word, 2-Line
+	b19		Dual Peak Filter	0-OFF, 1-ON
+
+[lParam of the display information]
+	b0-b2		Display width of FFT spectrum
+	b4-b5		FFT gain
+	b6-b7		FFT response time
+	b8		XY scope size
+	b10-b11		XY scope quality
+	b12		XY scope display on/off
+	b13		FFT gain test mode
+
+=============
+Shared memory
+=============
+ MMTTY can get you the raw data of the FFT spectrum and XY scope.  By this, you can arbitrarily display the FFT spectrum and XY scope in your window.  If you use the MMTTY control panel, you need not this data.
+
+ To utilize the shared memory, you must execute the following step before invoking MMTTY.
+
+#pragma pack(1)		// Enable pack of structer (VisualC++)
+#pragma option -a-	// Enable pack of structer (Borland C++Builder)
+typedef struct {
+	LONG	smpFreq;	// FFT display sampling frequency (->APP)
+	CHAR	title[128];	// Control panel title (->MMTTY)
+	CHAR	comName[16];	// PTT/FSK port name(->MMTTY)
+	LONG	smpFFT;		// 0-11025Hz 1-8000Hz base(->MMTTY)
+	LONG	flagFFT;	// FFT update flag (MMTTY <-> APP)
+	LONG	arrayFFT[2048];	// FFT raw data (->APP)
+	LONG	flagXY;		// XY scope update flag (MMTTY <-> APP)
+	LONG	arrayX[512];	// Mark signal raw data (->APP)
+	LONG	arrayY[512];	// Space signal raw data (->APP)
+	CHAR	verMMTTY[16];	// MMTTY version number (->APP)
+	CHAR	RadioName[16];	// The port name for radio command (->MMTTY)
+	LONG	flagLostSound;	// True if MMTTY has lost the sound (->APP)
+	LONG	flagOverflow;	// True if the input level is too high (->APP)
+	LONG	errorClock;	// Clock adjustment value for the sound card (ppm) (->APP)
+	LONG	smpDemFreq;	// Sampling frequency of the demodulator (->APP)
+	LONG	TxBufCount;	// The number of data that have not sent yet and remain in the TX buffer (->APP)
+	CHAR	ProfileName[16][64];	// Profile names
+
+	LONG	dummy[2048];	// Reserved
+}COMARRAY;
+#pragma pack()		// Disable pack of structer (VisualC++)
+#pragma option -a.	// Disable pack of structer (Borland C++Builder)
+
+ The instruction of the structure pack is dependent on a compiler.  Make sure that there is no dummy space between members.  Of course, you can access each atom with an offset address by declaring the whole struct in byte or long.
+  
+HANDLE	hMap;
+COMARRAY *pMap = NULL;
+hMap = ::CreateFileMapping(HANDLE(0xffffffff), NULL, PAGE_READWRITE,
+	0, sizeof(COMARRAY), "MMTTY");
+if( hMap != NULL ){
+	pMap = (COMARRAY *)::MapViewOfFile(hMap, FILE_MAP_WRITE,
+	 0, 0, 0);
+	if( pMap != NULL ){
+		memset(pMap, 0, sizeof(COMARRAY)); // fill memory by 0
+	}
+}
+
+ When MMTTY is invoked in the remote mode, it tries to open an inter-process shared memory named "MMTTY."  If MMTTY successfully opened it, MMTTY then checks the title, comName and comRadio of the shared memory.
+
+ In the title member, you specify the ASCIIZ text string that is appeared in the MMTTY control panel title and the Windows task bar.  If the text string is NULL, MMTTY uses the default text string.
+ In the comName member, you specify the port name for the PTT control in the ASCIIZ format.  If it is NULL, MMTTY uses the default port name defined by the user.
+ In the comRadio member, you specify the port name for the Radio Command in the ASCIIZ format.  If it is NULL, MMTTY uses the default port name defined by the user.
+
+ MMTTY periodically updates arrayFFT, arrayX, and arrayY, and then sends the TXM_LEVEL message.  At this timing, if flagFFT is 0, MMTTY updates only arrayFFT and puts 1 to flagFFT.  In the same manner, if flagXY is 0, MMTTY updates only arrayX and arrayY, and then puts 1 to flagXY.   Irrespective of the flags' state, MMTTY periodically sends the TXM_LEVEL message.
+
+ You can obtain the data by using the TXM_LEVEL message or by using the event of your timer.  Be sure that flagFFT and flagXY are active.  To continuously obtain the data, you must clear flagFFT and flagXY to 0 after you get the array data.
+
+ MMTTY puts the raw data in the shared memory so as not to sacrifice the flexibility of your program.
+
+ The frequency resolution of the FFT depends on the sampling frequency of MMTTY.  The sampling frequency is specified by the smpFreq member in the shared memory.  The initial value is 11025 Hz, but it can be changed by the user.  The maximal amplitude of the FFT data is 256, but it can be a little bit over 256.
+
+ If you want to use 8000 Hz as the sampling frequency base, you put 1 to the smpFFT member.  In this case, MMTTY converts the FFT data from 11025 Hz base to 8000 Hz base.
+
+ The XY scope data is constantly given at a half of 11025 Hz base sampling.  I do not think you have to pay special attention to it.  The amplitude can exceed +-16384.
+
+ The default value of the flagLostSound member is 0, but it is set to non 0 if MMTTY cannot process the decoding operation presumably due to the CPU overload.
+ The default value of the flagOverflow member is 0, but it is set to non 0 if the input level is too high, that is, the input level exceeds the 3/4 of the maximal level.
+ These members automatically go back to 0 after the fault condition is cleared.  It is a good idea to capture these conditions at the timing of the TXM_LEVEL message.
+
+ The errorClock member has the clock adjustment value in PPM.  The user can adjust the soundcard clock in the Setup window.
+ The smpDemFreq member has the sampling frequency of the MMTTY demodulator.
+
+ The txBufCount member has the number of data that are in the TX buffer.  It is a good idea to capture this data at the timing of the TXM_LEVEL message.
+
+
+==========================================================
+VB sample code for shared memory access by Bob Furzer K4CY
+==========================================================
+Here is a sample code for accessing the shared memory from VB.  Bob sent me this code for reference (thanks again to Bob).  Since I am not familiar with VB, I put the code unmodified.
+
+DO NOT SEND QUESTIONS ON THIS CODE TO BOB.  I CANNOT ANSWER, EITHER.
+
+Global hMap As Long
+Global pMap As Long
+
+Type COMARRAY
+    smpFreq As Long        
+    title As String * 64    
+    comName As String * 8   
+    smpFFT As Long          
+    flagFFT As Long        
+    arrayFFT(2048) As Long  
+    flagXY As Long          
+    arrayX(512) As Long     
+    arrayY(512) As Long     
+    verMMTTY As String * 8  
+    dummy(2048) As Long                                    
+End Type
+
+Global SharedMemory As COMARRAY
+
+Private Sub Form_Load()
+    
+    Const PAGE_READWRITE = &H4
+    Const SECTION_ALL_ACCESS = &H1 Or &H2 Or &H4 Or &H8 Or &H10 Or &HF0000
+    
+    On Error Resume Next
+
+    MMTTY_MSG = RegisterWindowMessage("MMTTY")
+    hMap = CreateFileMapping(-1, ByVal 0&, &H4, 0&, 20672, "MMTTY")
+    If hMap <> 0 Then
+        pMap = MapViewOfFile(hMap, SECTION_ALL_ACCESS, 0, 0, 0)
+        If pMap <> 0 Then
+            ZeroMemory ByVal pMap, 20672
+
+            SharedMemory.title = "RTTY Engine" & Chr$(0)
+            SharedMemory.radioName = "NONE" & Chr$(0)
+            SharedMemory.comName = "NONE" & Chr$(0)
+            SharedMemory.smpFFT = 1
+            SharedMemory.flagFFT = 0
+                        
+            CopyMemory ByVal pMap + 4, ByVal SharedMemory.title, Len(SharedMemory.title)
+            CopyMemory ByVal pMap + 132, ByVal SharedMemory.radioName, Len(SharedMemory.radioName)
+            CopyMemory ByVal pMap + 12464, ByVal SharedMemory.comName, Len(SharedMemory.comName)
+            CopyMemory ByVal pMap + 148, VarPtr(SharedMemory.smpFFT), 4
+            CopyMemory ByVal pMap + 152, VarPtr(SharedMemory.flagFFT), 4
+
+            X& = Shell("mmtty -t -h" & Hex$(Me.hwnd))
+            MMTTYhWnd = FindWindow(vbNullString, SharedMemory.title)
+            Form1.Caption = Str$(MMTTYhWnd)
+        Else
+            X& = MsgBox("MapViewOfFile API Failed", vbOKOnly, "Catastrophic Error")
+        End If
+    Else
+        X& = MsgBox("CreateFileMapping API falied", vbOKOnly, "Catastrophic error")
+    End If
+End Sub
+
+Private Sub Form_Unload(Cancel As Integer)
+    If UnmapViewOfFile(pMap) <> 0 Then Call CloseHandle(hMap)
+    X = PostMessage(MMTTYhWnd, MMTTY_MSG, 0, 0)
+End Sub
+
+==================
+Setup dialogue box
+==================
+ MMTTY has many parameters.  You can make MMTTY display the setup dialogue box by sending the RXM_SHOWSETUP message and provide a user with the setup user interface.
+ You might not be very happy with the dialogue box.  However, you will not have to modify your program a lot even if MMTTY changes the demodulator/modulator in the future.
+
+
+==================
+Store and Retrieve of the Profile
+==================
+ MMTTY has many parameters.  It should not be a convenient way that the user opens the dialog box and changes the parameters' value during the RTTY operation.  For this reason, I have added the profile menu in version 1.60B, so that the user can retrieve and store the parameters in a simple way.  The profile has the parameters for the demodulator, decoder, and modulator.
+
+ The stand-alone MMTTY has eight slots for the profile saving, while the remote-mode MMTTY has 16 slots (Slots 0 to 15) at maximum.  Slots 0 to 7 are common to the stand-alone MMTTY.
+
+ All the parameters in Slots 0 to 15 are stored as Define entries 0 to 15 in UserPara.ini file.
+
+ The application even could modify the parameter in UserPara.ini file and send the RXM_PROFILE message to MMTTY in order to change the specific parameter.  It is recommended to use Slot 15 as a temporary slot.
+
+ If you have figured out a parameter set that works effectively for flutter or multi-path, it is a good idea to provide it to the users with your UserPara.ini, which you will include in your distribution package.  In UserPara.ini, you can delete the definition lines of parameters that you do not want to change.
+
+ When MMTTY saves the profile in the remote mode, it automatically assigns Remote 1 to Remote 16 to the names of profiles (Name=) in UserPara.ini.  If you want to define another entry in UserPara.ini, you can create a specific entry (e.g., RemoteName=) and save a parameter there.  MMTTY will not change the entry you have added.
+
+  In case you do not use the shared memory, MMTTY automatically uses the names, Remote 1 - Remote 16, as the default profile names in UserPara.ini.  If you define other names in your program, it is a good idea to make your own entry (e.g., RemoteName=) in UserPara.ini and store the data there.  MMTTY never changes the entries you added.
+
+
+
+===============
+Closing comment
+===============
+You may utilize the MMTTY remote mode with your program under the following conditions:
+
+1) - If you distribute your program as freeware, you can use the MMTTY remote mode and include MMTTY as a part of the distribution.
+
+2) - If you distribute a commercial program, you can include a code that uses the MMTTY remote mode in your software. However, you cannot include MMTTY as a part of the distribution.
+
+Authors of the software using the MMTTY remote mode do not have to get permission of JE3HHT - Makoto (Mako) Mori. Feel free to use MMTTY, as it is freeware.
+
+
+73, Mako - JE3HHT
+

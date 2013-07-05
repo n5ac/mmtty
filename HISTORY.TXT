@@ -1,0 +1,230 @@
+MMTTYの変更履歴
+
+[V1.00	2000-06-30]
+◎初回公開
+
+[V1.01 -> V1.10	2000-07-08]
+◎サウンドカードのバッファサイズ設定を追加
+◎マニュアルの一部記載漏れを修正
+◎送信画面のサイズをINIファイルに記憶
+◎ログ機能を追加
+◎一部の256色ビデオアダプタでWaterFallが正しく表示できないバグを修正
+◎前置フィルタを追加
+◎設定画面にフィルタ特性表示の追加
+◎メイン画面に積分器（LPF）の設定ボックスを配置
+◎WaterFall,受信画面,送信画面の色の設定を追加
+◎新しいログファイルのオープンを実行後に検索ができなくなるバグを修正
+◎FSK送信の対応（Tnx JA7DHJ）
+◎デモジュレータ入力部に適応フィルタ（LMS）を入れれるようにした
+◎FSK(TXD)出力の送出ビットが逆順になっていたバグを修正（Tnx JA7DHJ）
+◎その他、細かい点の修正と若干の機能追加
+
+[V1.11 -> V1.20	2000-07-13]
+◎PTT制御ポートにCOM5～COM8を追加(Tnx JH3XDO)
+◎マクロおよび定型メッセージの変換子に「%g」と「%f」を追加
+◎QSOログのテキストファイルへのエクスポート機能を追加
+◎QSOログのテキストファイルからのインポート機能を追加
+◎FSK(TXD)運用時の送受切り替えのバグの修正(Tnx JA1FQI)
+◎文字ウイエト、Diddleウエイトを追加(Tnx JA1IQV)
+◎表示メニューに「受信画面のクリア」を追加(Tnx JG3LGD)
+◎LMS動作の改善
+◎V1.14で発生したある条件で起動できなくなるバグの修正
+◎マクロボタンのショートカットキーの割り当て(Tnx JA1IQV)
+◎自動で受信に戻る際の微妙なタイミングを修正
+◎LOG200データファイルとの相互変換を追加
+◎ＸＹスコープ表示を追加(Tnx JA1IQV)
+◎周波数弁別器のデフォルトをFIR型BPFからIIR型共振器に変更
+◎XYスコープ、マーク周波数を水平にした(Tnx JA1IQV)
+◎XYスコープ表示を改善
+◎デモジュレータにリミッタアンプを追加(Tnx 7L1CUH, JA1IQV)
+◎デモジュレータのAGC機能を廃止
+
+[V1.21 -> V1.30	2000-07-23]
+◎サウンドの記録と再生機能を追加（Tnx 7L1CUH）
+◎IIR型共振器の周波数特性表示を追加
+◎XY-Scopeの表示サイズを選択可能にした
+◎LMSにInv（誤差信号出力）を追加
+◎サウンドの録音・再生機能を強化
+◎サウンド再生時にサウンドカードに信号を出力するようにした
+◎PLL方式のデモジュレータの追加
+◎再生位置設定画面を追加
+◎文字ウイエト、DiddleウエイトのスライドをA型ボリュームに変更
+◎オシロスコープ画面に「Play」ボタンを追加
+◎MMTTYの信号処理の解説「digital.txt」を追加
+◎DTRへの符号データ出力選択を廃止（旨く働かない）
+◎Turbo Hamlogデータファイルとの相互変換を追加
+◎ショートカットキーのカスタマイズを追加(Tnx 7L1CUH)
+◎ログ機能の若干の強化
+◎マクロの先頭と末尾のスペースが記録できないバグの修正(Tnx 7L1CUH)
+◎設定画面にSound処理Priorityの選択を追加(Tnx JH1SWD)
+◎Priorityのデフォルトを「Critical」→「Highest」に変更(Tnx JH1SWD)
+◎Hamlog->MMTTYでMyRSTの変換のT抜けを修正(Tnx JH1SWD)
+◎起動時のサウンドカードオープンのリトライを追加(Tnx JA6VAG)
+◎Rx-Stopビットのデフォルトを1.42bit -> 1bitに変更
+◎Hamlog->MMTTY変換の一部のバグを修正(Tnx JH1SWD)
+◎コントロールパネル表示のOn/Offの追加
+◎コントロールパネルサイズの選択を追加
+◎その他細かい点の改善
+
+[V1.31 -> V1.40  2000-07-30]
+◎ログファイルの変換動作を改善(Tnx JH1SWD)
+◎問い合わせメッセージを改善(Tnx JH1SWD)
+◎プログラムメニューの追加(Tnx JH1SWD, JA1IQV)
+◎外部プログラム実行時のカレントディレクトリを設定(Tnx JH1SWD)
+◎スケルチ動作の若干の改善
+◎英語モードを追加(Tnx HL1AQ)
+◎低速CPUのためのLocalEchoオプションを追加
+◎マクロテキストを送信画面経由で出力するオプションを追加(Tnx JA1IQV)
+◎一番最初のログデータ記録でエラーになるバグを修正
+◎ログのUTC表示(TimeZone選択)を追加
+◎初回起動時の言語問い合わせを廃止（自動判定に変更）
+◎XYScopeの回転方向を逆にするオプションを追加(Tnx JA9AVA)
+◎スケルチ動作の改善
+◎WaitDiddleOutオプションを追加
+◎Limitボタンを廃止
+◎NETボタンの追加
+◎DXボタンのデフォルトゲインを100に変更
+◎マウスでのMyRST取りこみにコンテストモードを追加
+◎Control PanelサイズにLargeを追加(Tnx JE8LWZ)
+◎SQレベル表示をSQ-OFF時にも動作するようにした
+◎AFCのShift変更アルゴリズムにHAMモードを追加
+◎NETボタンの動作不具合を修正
+◎各マクロボタンの編集にショートカットキーを割り当て可能にした(Tnx JA1IQV)
+◎マクロ参照キーワードに「%s」を追加(Tnx JH3XDO)
+◎その他細かい点の改善
+
+[V1.41 -> V1.50  2000-08-08]
+◎積分器にIIR-LPFを追加
+◎積分器の特性確認ボタンを追加
+◎XYScope表示の処理品質の選択を追加
+◎XYScope表示のリミッターでの位相歪みによる影響を緩和
+◎リミッターの「Over Sampling」の選択を追加(参照→Digital.txt)
+◎サウンドカードのクロック補正値を設定可能にした(Tnx JA1WSK)
+◎クロック補正でJJYの１秒チック音を利用可能にした(Tnx JA1WSK)
+◎FSK送信(TXD)時にUARTのタイミングで送信できる選択を追加
+◎Diddle ON時に受信への切り替えが遅れていた点を改善
+◎Diddleの「WaitTimer」を追加(Tnx JA1IQV)
+◎LTR/FIGコードの強制出力を追加(Tnx JA1IQV)
+◎定型メッセージ参照キーワードに「^」を追加(Tnx JA1IQV)
+◎低速CPU時に問い合わせメッセージ表示が遅れるのを少し改善
+◎その他細かい点の改善
+
+[V1.51  2000-08-08]
+◎Pentium75MHzでの操作応答を少し改善
+◎不要（無意味）な設定スイッチの廃止
+◎サスペンド時のCPU時間を更に解放
+◎マニュアル（本書）に処理軽減化の処置を記載
+
+[V1.52  2000-08-10]
+◎キー操作によるシフト幅変更機能を追加(Tnx JA3KWZ)
+◎AFCのアルゴリズムに「FSK」を追加(Tnx JA3KWZ)
+◎マクロ参照キーワードに「~」「[」「]」を追加
+◎送信切り替え直後のDiddle送出を0.25秒間禁止
+◎細かい点の修正
+
+[V1.53  2000-08-12]
+◎AFCのHAM,FSKのアルゴリズムにシフト幅220Hz/240Hzを追加
+◎FFTのゲイン選択を追加
+◎細かい点の修正
+
+[V1.54  2000-08-13]
+◎「Ctrl+BS」キーで未送信の1行を消去できるようにした(Tnx JA1IQV)
+◎マクロ参照キーワードの先頭に記述する「#」を追加(JH8WIG)
+◎マクロ参照キーワードに「%E」を追加(Tnx JA1IQV)
+◎送信画面でのキーワード参照動作に「即時変換」を追加(Tnx JG1GGU)
+
+[V1.55  2000-08-15]
+◎Diddleのデフォルトを「NONE」から「LTR」に変更(Tnx K6STI)
+◎「Disable Rev」（送信時にRevを無効にする）を追加(Tnx W6/G0AZT)
+◎定型メッセージのドロップリストの表示数を１６に増やした(Tnx JE4CIL)
+
+[V1.56  2000-08-20]
+◎MMTTY.TXT内のDsubピン番号の誤りを修正(Tnx MMTTY-Gropu)
+◎マーク周波数の下限を300Hzに変更(Tnx MMTTY-Group)
+◎「受信画面のクリア」にショートカットを定義できるようにした(Tnx MMTTY-Group)
+◎「ESC」をショートカットキーのリストに追加(Tnx MMTTY-Group)
+◎ADIFファイルへのエクスポートを追加(Tnx JA5HRE, MMTTY-Group)
+◎タイムスタンプをUTC表示できるようにした(Tnx MMTTY-Group)
+◎QSOデータ表示でUTC表示できなかったバグを修正(Tnx MMTTY-Group)
+◎599ボタンを廃止し代わりにバンドボックスを配置
+
+[V1.57  2000-08-24]
+◎コールサインクリック時に即検索するように変更(Tnx MMTTY-Group)
+◎ワード単位での文字の送信を追加(Tnx MMTTY-Group)
+◎コテンストのランニングモードとS&Pモードを追加(Tnx MMTTY-Group)
+◎英語版用にSetup HelpメニューとHTML Help表示機能を追加(Tnx MMTTY-Group)
+
+[V1.58  2000-09-07]
+◎英語版用にWindows Helpのアクセス機能を追加(Tnx KX2A)
+◎マクロキーワードに「%D」と「%T」を追加(Tnx MMTTY-Group)
+◎マクロキーワードの「~」と「_」の動作を改善(Tnx MMTTY-Group)
+◎DXボタンを削除しATCボタンを追加
+◎定型メッセージ参照キーワードに「#」を追加(Tnx MMTTY-Group)
+
+[V1.59 2000-10-15]
+◎即時変換時でも「%F」と「%L」は常に送信時に変換するように改善(Tnx JA1IQV)
+◎日本語版にRTTY BASICSのヘルプポインタを追加（Tnx W7TI, JA7UDE）
+◎マウスでの取りこみにCQ/RJモードを追加（Tnx JA1IQV, K5YG）
+◎コンテストモード時のマウスでの取りこみ動作の改善（Tnx JA1IQV）
+◎Hamlogとの変換でモードを定義可能にした（Tnx JE4CIL, 7L1CUH）
+◎ADIFへのRST出力のデフォルト動作を変更（Tnx MMTTY-Group）
+◎TNC模擬モードを追加
+◎テキストファイル送信の文字数制限をなくした（Tnx MMTTY-Group）
+◎リモートモードを追加（Tnx K4CY）
+◎時刻取得にオフセットを設定できるようにした（Tnx JR3KFX)
+◎ウインドウサイズと位置をオプションで記憶可能にした（Tnx MMTTY-Group）
+◎マクロボタンに色を定義可能にした（Tnx MMTTY-Group）
+◎TXボタン操作時に自動改行を出力できるようにした（Tnx JH1BIH）
+◎マクロボタン(16個)表示をON/OFF可能にした
+◎メイン画面から'BW'をクリックしてBaudを操作可能にした（Tnx MMTTY-Group）
+◎サウンドカードのID番号を設定できるようにした（Tnx MMTTY-Group）
+◎日付の表現を選択できるようにした（Tnx MMTTY-Group）
+◎PTT制御にRadioCommandを追加（Tnx KB2EOQ, JA1WSK, MMTTY-Group）
+◎マクロボタン(16個)にリピート機能を追加（Tnx MMTTY-Group）
+◎TXボタンの自動改行設定がINIファイルにセーブできないバグを修正（Tnx JA1IQV）
+◎サウンドカードのサンプリング周波数を変更可能にした
+◎LMSの代わりにノッチフィルタを選択できるようにした
+◎マーク周波数のドロップリストに1275Hzを追加(Tnx JA1ADN)
+◎'%D'マクロの出力書式を日付形式で変更可能にした
+◎マクロボタンの横１列並び表示を追加(Tnx MMTTY Group)
+◎FSKの出力タイミングを改善
+◎２つのノッチ周波数を使用できるようにした
+◎ログのテキストインポートのバグの修正(Tnx MMTTY Group)
+◎YYYY形式のバグの修正(Tnx MMTTY Group)
+
+[V1.60 2000-12-17]
+◎キーボードのワードラップ機能を追加(Tnx JH1BIH)
+◎リモートモードの改善(Tnx K4CY, MMTTY group)
+◎マクロ定義画面に「Commands」ボタンを追加(Tnx MMTTY group)
+◎受信画面の送信文字に色を定義可能にした(Tnx MMTTY group)
+◎ADIFファイルのインポートを追加(Tnx MMTTY-Group)
+◎USB-Comポート対策でFSK-TXDの処理方法の選択を追加(Tnx KD6AZN, JA7UDE, MMTTY-Group)
+◎OnQSO,OffQSO,Captureのショートカット定義の追加(Tnx JA1WSK, MMTTY-Group)
+◎マクロキーワードに「%M」「%t」を追加(Tnx MMTTY-Group)
+◎文字フォントにスタイルを適用(Tnx MMTTY-Group)
+◎英語モード時にJCC/JCG画面のQTHを英語で表記する(Tnx MMTTY-Group)
+◎FFTウインドウ上のノッチ周波数位置にマーカーを表示(Tnx MMTTY-Group)
+◎RadioCommandにVFOポーリング機能を追加(Tnx JA1WSK, KX2A, MMTTY-Group)
+◎ステレオモードでサウンドカードを扱うオプションを追加(Tnx MMTTY-Group)
+
+[V1.61 2001-01-26]
+◎時刻オフセットに分を追加（Tnx MMTTY-Group）
+◎リモートモードの改善（Tnx K4CY, Zakanaka-Group）
+◎DSP部分の処理速度の改善
+◎WindowsNT/2000でのロックの問題を解決（Tnx MMTTY-Group）
+◎送信時の「Always fix shift」オプションを追加（Tnx K4CY）
+◎VFOポーリングにKenwoodを追加（Tnx MMTTY-Group）
+◎プロファイルメニューの追加
+◎クロック調整画面の操作改善
+◎TNCエミュレーションに「Baudot modem」を追加
+◎時刻オフセットに「夏時間調整の無視」を追加（Tnx K4CY）
+◎ログのエクスポートに「Cabrillo file」を追加（Tnx W6/G0AZT, MMTTY-Group）
+
+[V1.62 2001-09-22]
+◎復調器のリミッタにAGCオプションを追加
+◎リモートモードの改善 (Tnx to K4CY, JK1IQK and MMTTY group)
+◎VFOポーリングにFT1000Dを追加(Tnx to MMTTY group)
+◎VFOポーリングにFT920を追加(Tnx to MMTTY group)
+◎Turbo Hamlogとのリアルタイムリンクを追加(Tnx to JG1MOU)
+◎その他、細かいバグの修正と改善
+

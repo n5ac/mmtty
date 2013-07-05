@@ -1,0 +1,19 @@
+Error 00001. 0x400000 (Thread 0x0DF0):
+Exception 0xC0000005: Access violation at 0x2B511DC.
+Call Tree:
+   0x006309D5(=mmtty.exe:0x01:22F9D5)
+   0x0062F22A(=mmtty.exe:0x01:22E22A)
+   0x0CD0682A(=CG32.DLL:0x01:00582A)
+   0x0CD15053(=CG32.DLL:0x01:014053)
+   0x0CD1602E(=CG32.DLL:0x01:01502E)
+   0x0CD2783E(=CG32.DLL:0x01:02683E)
+   0x0CD011BF(=CG32.DLL:0x01:0001BF)
+   0x778AD6B2(=ntdll.dll:0x01:03D6B2)
+   0x778AD554(=ntdll.dll:0x01:03D554)
+   0x754C7A0D(=kernel32.dll:0x01:007A0D)
+   0x0063AFFC(=mmtty.exe:0x01:239FFC)
+   0x0063A37F(=mmtty.exe:0x01:23937F)
+   0x0063A398(=mmtty.exe:0x01:239398)
+   0x0063B2D4(=mmtty.exe:0x01:23A2D4)
+
+------------------------------------------
