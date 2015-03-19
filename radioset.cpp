@@ -33,7 +33,7 @@ LPCSTR	__MK[]={
 	"Yaesu  FT 736, 817, 847, 857, 897",                            //AA6YQ 1.66 cosmetic, MakerIndex=2
 	"Icom  xx=addr 01-7F",                          //                   , MakerIndex=3
 	"Ten-Tec Omni VI  xx=addr 00-64",               //                   , MakerIndex=4
-	"Kenwood, Elecraft ",                                      //                   , MakerIndex=5
+	"Kenwood, Elecraft, FlexRadio ",                                      //                   , MakerIndex=5
 	"JRC JST-245",                                  //                   , MakerIndex=6
 	"Clear",                                        //                   , MakerIndex=6
 	NULL,                                           //                   , MakerIndex=8
@@ -94,7 +94,7 @@ const POLLDEF	__VT4[]={
 };
 const POLLDEF	__VT5[]={
 	{ "NONE", 0 },
-	{ "Kenwood, Elecraft", RADIO_POLLKENWOOD },
+	{ "Kenwood, Elecraft, FlexRadio", RADIO_POLLKENWOOD },
 	{ "Kenwood, Elecraft (use auto info)", RADIO_POLLKENWOODN },
 	{ NULL, 0 },
 };
@@ -394,7 +394,7 @@ int __fastcall TRADIOSetDlg::IsCompatible(int PollType, int MakerIndex)
         }
         else if (PollType == RADIO_POLLFT9000) {
             return 1;
-        }
+		}
         else if (PollType == RADIO_POLLFT2000) {
             return 1;
         }

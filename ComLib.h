@@ -31,7 +31,7 @@
 #include <mbstring.h>
 #include <SHELLAPI.H>
 
-#define	VERID	"Ver1.68"       //AA6YQ 1.65D->1.66G,  JE3HHT 1.67
+#define	VERID	"Ver1.70"       //K6TU 1.68A -> 1.70A AA6YQ 1.65D->1.66G,  JE3HHT 1.67
 #define	VERBETA	"A"
 #define	VERTTL2	"MMTTY "VERID VERBETA
 #define	VERTTL  VERTTL2" (C) JE3HHT 2000-2010."
