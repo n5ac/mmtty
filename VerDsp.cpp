@@ -46,6 +46,7 @@ __fastcall TVerDspDlg::TVerDspDlg(TComponent* AOwner)
 	Version->Caption = VERTTL;
 	LTNX->Caption =
 	"------ Programming ------\r\n"
+	"Stu, K6TU (Updated 1.66A -> 1.70A)\r\n"
     "Dave, AA6YQ (updated 1.65D -> 1.66G)\r\n"
 	"------ Help, FAQ and Remote mode, etc... ------\r\n"
 	"Jan, KX2A  Ken, VE5KC  Bill, KB4IJ  Andy, K3UK(KB2EOQ)\r\n"

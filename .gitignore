@@ -11,3 +11,7 @@
 *.lai
 *.la
 *.a
+
+# C++Builder generated files
+mmtty.exe
+Debug_Build/*
