@@ -487,7 +487,7 @@ public:
 	~CScope();
 	void WriteData(double d);
 	void UpdateData(double d);
-	inline int GetFlag(void){m_DataFlag; return 0;};	//JA7UDE 0428
+	inline int GetFlag(void){return m_DataFlag;};	//JA7UDE 0428, edited by JA7UDE (Jan 17, 2016)
 	void Collect(int size);
 };
 
