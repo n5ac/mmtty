@@ -1035,19 +1035,34 @@ void CCradio::FreqKenwood(void)
 }
 
 //AA6YQ 1.66B
+//G3WYW Fix for FT-991
 void CCradio::FreqYaesu9K2K(void)
 {
-//0123456789012
-//IF00021155000     +001000 0002000008 ;
-//abcdefghijklmnopqrstuvwxyz1234567890      <----　桁位置
-//f - m  周波数　21.155MHz
+//000000000011111111112222222222
+//012345678901234567890123456789
+//IF000021155000+0000RTMVCTTS; <= FT991
+//IF00021155000+0000RTMVCTTS;  <= FT9K2K
+//abcdefghijklmnopqrstuvwxyz1234567890      <----　桁位置 Digit Posn
+//f - m  周波数 freq　21.155MHz
 
-	ULONG fq = 0;
+    ULONG fq = 0;
 
-	m_rxbuf[13] = 0;
-	if( sscanf((LPCSTR)&m_rxbuf[5], "%lu", &fq) == 1 ){
-		if( fq ) UpdateFreq(double(fq)/1e6);
-	}
+//G3WYW Feb 2016 am I a FT-991 or FT9K2K?
+    if (m_rxbuf[26] == ';')
+    {    //FT9K2K
+        m_rxbuf[13] = 0;
+        if( sscanf((LPCSTR)&m_rxbuf[5], "%lu", &fq) == 1 ){
+            if( fq ) UpdateFreq(double(fq)/1e6);
+        }
+    }
+    else //FT991
+    {
+        m_rxbuf[14] = 0;
+        if( sscanf((LPCSTR)&m_rxbuf[5], "%lu", &fq) == 1 ){
+            if( fq ) UpdateFreq(double(fq)/1e6);
+        }
+    }
+
 }
 
 void CCradio::FreqJST245(void)
