@@ -1042,7 +1042,7 @@ void CCradio::FreqYaesu9K2K(void)
 //012345678901234567890123456789
 //IF000021155000+0000RTMVCTTS; <= FT991
 //IF00021155000+0000RTMVCTTS;  <= FT9K2K
-//abcdefghijklmnopqrstuvwxyz1234567890      <----　桁位置 Digit Posn
+//abcdefghijklmnopqrstuvwxyz1234567890      <----　Digit position
 //f - m  周波数 freq　21.155MHz
 
     ULONG fq = 0;
