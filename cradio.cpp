@@ -1035,7 +1035,7 @@ void CCradio::FreqKenwood(void)
 }
 
 //AA6YQ 1.66B
-//G3WYW Fix for FT-991
+//G3WYW Fix for FT-991  1.70B
 void CCradio::FreqYaesu9K2K(void)
 {
 //000000000011111111112222222222
