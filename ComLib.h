@@ -32,7 +32,10 @@
 #include <SHELLAPI.H>
 
 #define	VERID	"Ver1.70"       //K6TU 1.68A -> 1.70A AA6YQ 1.65D->1.66G,  JE3HHT 1.67
-#define	VERBETA	"A"
+#define	VERBETA	"D"             //JA7UDE 1.70A -> 1.70B G3WYW FT-991 CAT support
+								//AA6YQ 1.70C added COM16-32 to PTT/FSK port selector and Radio port selector, added 991 to Yaesu Maker selector entry
+								//AA6YQ 1.70D prevent shift > 4000 Hz so CSlideFFT::Create does not divide by zero
+
 #define	VERTTL2	"MMTTY "VERID VERBETA
 #define	VERTTL  VERTTL2" (C) JE3HHT 2000-2010."
 

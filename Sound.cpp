@@ -60,7 +60,7 @@ __fastcall TSound::TSound(bool CreateSuspended)
 
 	m_ReqFifoSize = 0;
     m_IDDevice = WAVE_MAPPER;
-    m_IDOutDevice = WAVE_MAPPER; //AA6YQ 1.6.6
+	m_IDOutDevice = WAVE_MAPPER; //AA6YQ 1.66
 	m_playmode = 0;
 	m_susp = 0;
 	m_suspack = 0;
@@ -1074,7 +1074,7 @@ int __fastcall TSound::DrawFFTWater(Graphics::TBitmap *pBitmap, int sw, int XRD)
 
 
 //---------------------------------------------------------------------------
-//AA6YQ 1.6.6
+//AA6YQ 1.66
 LPCSTR __fastcall TSound::GetInputSoundcard(unsigned int ID)
 {
 

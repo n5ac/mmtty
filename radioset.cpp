@@ -29,7 +29,7 @@
 //Define Maker groups; index is used by IsCompatible to select the correct Maker based on PollType (RADIO_POLLx)
 LPCSTR	__MK[]={
 	"Yaesu FT 1000D, 1000MP, 920",                  //AA6YQ 1.66 cosmetic, MakerIndex=0
-    "Yaesu  FT 9000, 2000, 950, 450",                //AA6YQ 1.66         , MakerIndex=1
+    "Yaesu  FT 9000, 2000, 991, 950, 450",                //AA6YQ 1.66         , MakerIndex=1
 	"Yaesu  FT 736, 817, 847, 857, 897",                            //AA6YQ 1.66 cosmetic, MakerIndex=2
 	"Icom  xx=addr 01-7F",                          //                   , MakerIndex=3
 	"Ten-Tec Omni VI  xx=addr 00-64",               //                   , MakerIndex=4
@@ -559,4 +559,5 @@ void __fastcall TRADIOSetDlg::SBHelpClick(TObject *Sender)
 	ShowHtmlHelp("radiocommand.htm");
 }
 //---------------------------------------------------------------------------
+
 

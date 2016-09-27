@@ -740,22 +740,26 @@ void CFSKDEM::SetLPFFreq(double f)
 
 void CFSKDEM::SetMarkFreq(double d)
 {
-	m_SetMarkFreq = m_AFCMarkFreq = m_MarkFreq = d;
-	MakeFilter(HMark, m_Tap, ffBPF, DemSamp, m_MarkFreq-m_FilWidth, m_MarkFreq+m_FilWidth, 60, 1.0);
-	SetIIR(m_iirfw);
-    m_Phase.SetCarrierFreq(m_AFCMarkFreq);
-	if( m_AFCSpaceFreq > m_AFCMarkFreq ) m_Phase.SetShift(m_AFCSpaceFreq - m_AFCMarkFreq);
-    m_AA6YQ.SetMarkFreq(m_AFCMarkFreq);
+	if ((m_AFCSpaceFreq - d) < 4000) {    //1.70D prevent divide by zero in M_SlideFFT.Create
+		m_SetMarkFreq = m_AFCMarkFreq = m_MarkFreq = d;
+		MakeFilter(HMark, m_Tap, ffBPF, DemSamp, m_MarkFreq-m_FilWidth, m_MarkFreq+m_FilWidth, 60, 1.0);
+		SetIIR(m_iirfw);
+		m_Phase.SetCarrierFreq(m_AFCMarkFreq);
+		if( m_AFCSpaceFreq > m_AFCMarkFreq ) m_Phase.SetShift(m_AFCSpaceFreq - m_AFCMarkFreq);
+		m_AA6YQ.SetMarkFreq(m_AFCMarkFreq);
+	}
 }
 
 void CFSKDEM::SetSpaceFreq(double d)
 {
-	m_SetSpaceFreq = m_AFCSpaceFreq = m_SpaceFreq = d;
-	MakeFilter(HSpace, m_Tap, ffBPF, DemSamp, m_SpaceFreq-m_FilWidth, m_SpaceFreq+m_FilWidth, 60, 1.0);
-	SetIIR(m_iirfw);
-    m_Phase.SetCarrierFreq(m_AFCMarkFreq);
-	if( m_AFCSpaceFreq > m_AFCMarkFreq ) m_Phase.SetShift(m_AFCSpaceFreq - m_AFCMarkFreq);
-    m_AA6YQ.SetSpaceFreq(m_AFCSpaceFreq);
+	if ((d - m_AFCMarkFreq) < 4000) {    //1.70D prevent divide by zero in M_SlideFFT.Create
+		m_SetSpaceFreq = m_AFCSpaceFreq = m_SpaceFreq = d;
+		MakeFilter(HSpace, m_Tap, ffBPF, DemSamp, m_SpaceFreq-m_FilWidth, m_SpaceFreq+m_FilWidth, 60, 1.0);
+		SetIIR(m_iirfw);
+		m_Phase.SetCarrierFreq(m_AFCMarkFreq);
+		if( m_AFCSpaceFreq > m_AFCMarkFreq ) m_Phase.SetShift(m_AFCSpaceFreq - m_AFCMarkFreq);
+		m_AA6YQ.SetSpaceFreq(m_AFCSpaceFreq);
+	}
 }
 
 void CFSKDEM::AFCMarkFreq(double d)

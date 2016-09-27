@@ -123,7 +123,7 @@ public:
 	void __fastcall InitWFX(void);
 
 	UINT	m_IDDevice;
-    UINT    m_IDOutDevice; //AA6YQ 1.6.6
+    UINT    m_IDOutDevice; //AA6YQ 1.66
 
 	int		m_playmode;
 	int		m_susp;
