@@ -458,6 +458,8 @@ __fastcall TMmttyWd::TMmttyWd(TComponent* Owner)
 	sys.m_SoundPriority = 1;
 	sys.m_SoundStereo = 0;
 
+	sys.m_HideFlexAudio=0;     //AA6YQ 1.70E
+
 	sys.m_txuos = 1;
 	sys.m_dblsft = 0;
 
@@ -1586,7 +1588,12 @@ void __fastcall TMmttyWd::OpenClosePTT(void)
 			delete pComm;
 			pComm = NULL;
 			if( !Remote || !m_RemoteTimer ){
-				ErrorMB( (Font->Charset != SHIFTJIS_CHARSET)? "Cannot open '%s'":"'%s'がオープンできません.", sys.m_TxRxName.c_str());
+				if (cm.Baud<110){ //1.70F notify user if attempting to open port at low speed, as many devices can't do this
+					ErrorMB( (Font->Charset != SHIFTJIS_CHARSET)? "Cannot open '%s' at '%s' baud; if the selected serial port can't handle this baud rate, use EXTFSK.":"'%s'をボーレート'%s'で開けません.もし、選択したシリアルポートがこのボーレートをサポートしていないときはEXTFSKを使ってください。", sys.m_TxRxName.c_str(),AnsiString(cm.Baud).c_str());
+				}
+				else {
+					ErrorMB( (Font->Charset != SHIFTJIS_CHARSET)? "Cannot open '%s'":"'%s'がオープンできません.", sys.m_TxRxName.c_str());
+				}
 			}
 		}
 _noerr:;
@@ -2031,10 +2038,13 @@ void __fastcall TMmttyWd::ReadRegister(void)
 	if( sys.m_SoundFifoTX > WAVE_FIFO_MAX ) sys.m_SoundFifoTX = WAVE_FIFO_MAX;
 	sys.m_SoundPriority = pIniFile->ReadInteger("Define", "SoundPriority", sys.m_SoundPriority);
 	sys.m_SoundDevice = pIniFile->ReadInteger("Define", "SoundDevice", sys.m_SoundDevice);
-    sys.m_SoundOutDevice = pIniFile->ReadInteger("Define", "SoundOutDevice", sys.m_SoundDevice); //AA6YQ 1.66
+	sys.m_SoundOutDevice = pIniFile->ReadInteger("Define", "SoundOutDevice", sys.m_SoundDevice); //AA6YQ 1.66
+
+	sys.m_HideFlexAudio = pIniFile->ReadInteger("Define", "HideFlexAudio", sys.m_HideFlexAudio); //AA6YQ 1.70E
+
 	sys.m_SoundMMW = pIniFile->ReadString("Define", "SoundMMW", sys.m_SoundMMW);
 	pSound->m_IDDevice = sys.m_SoundDevice;
-    pSound->m_IDOutDevice=sys.m_SoundOutDevice;
+	pSound->m_IDOutDevice=sys.m_SoundOutDevice;
 	sys.m_SoundStereo = pIniFile->ReadInteger("Define", "SoundStereo", sys.m_SoundStereo);
 	pSound->InitWFX();
 	pSound->FSKDEM.SetFilterTap(pIniFile->ReadInteger("Define", "Tap", pSound->FSKDEM.GetFilterTap()));
@@ -2370,9 +2380,11 @@ void __fastcall TMmttyWd::WriteRegister(void)
 	pIniFile->WriteInteger("Define", "SoundTxFifo", sys.m_SoundFifoTX );
 	pIniFile->WriteInteger("Define", "SoundPriority", sys.m_SoundPriority);
 	pIniFile->WriteInteger("Define", "SoundDevice", sys.m_SoundDevice);
-    pIniFile->WriteInteger("Define", "SoundOutDevice", sys.m_SoundOutDevice);   //AA6YQ 1.66
+	pIniFile->WriteInteger("Define", "SoundOutDevice", sys.m_SoundOutDevice);   //AA6YQ 1.66
 	pIniFile->WriteInteger("Define", "SoundStereo", sys.m_SoundStereo);
 	pIniFile->WriteString("Define", "SoundMMW", sys.m_SoundMMW);
+
+	pIniFile->WriteInteger("Define", "HideFlexAudio", sys.m_HideFlexAudio);    //AA6YQ 1.70E
 
 	pIniFile->WriteInteger("Define", "Tap", pSound->FSKDEM.GetFilterTap());
 	pIniFile->WriteInteger("Define", "IIRBW", pSound->FSKDEM.m_iirfw);
@@ -8665,7 +8677,13 @@ void __fastcall TMmttyWd::RemoteMMTTY(tagMSG &Msg)
 				COMM.change = 1;
 				OpenCloseCom();
             }
-        	break;
+			break;
+		case RXM_SOUNDSOURCE:		// Added by AA6YQ 1.70F
+			if( sys.m_SoundStereo != (Msg.lParam & 0x03) ){
+				sys.m_SoundStereo = Msg.lParam & 0x03;
+				pSound->InitSound();
+            }
+			break;
 		default:
 			break;
 	}

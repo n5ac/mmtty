@@ -270,7 +270,7 @@ __published:
     TLabel *Label2;
     TLabel *Label3;
     TTabSheet *TabSound;
-    TRadioGroup *InputSoundcards;
+	TRadioGroup *InputSoundcards;
     TRadioGroup *OutputSoundcards;
 	TComboBox *Tones;
 	TGroupBox *GB20;
@@ -279,8 +279,9 @@ __published:
 	TCheckBox *CBFix45;
 	TCheckBox *CBAA6YQ;
 	TSpeedButton *SBAA6YQ;
+	TCheckBox *HideFlexAudio;
 	void __fastcall HamBtnClick(TObject *Sender);
-	
+
 	
 	
 	
@@ -345,12 +346,15 @@ __published:
     void __fastcall DevOutNoDropDown(TObject *Sender);
 
     void __fastcall InputSoundcardsClick(TObject *Sender);
-    void __fastcall OutputSoundcardsClick(TObject *Sender);
+	void __fastcall OutputSoundcardsClick(TObject *Sender);
 
     void __fastcall DevNoClick(TObject *Sender);
     void __fastcall DevOutNoClick(TObject *Sender);
 
 	void __fastcall SBAA6YQClick(TObject *Sender);
+	void __fastcall HideFlexAudioClick(TObject *Sender);
+
+
 private:
 	int m_FontCharset;
 	int	m_FontStyle;
@@ -390,4 +394,4 @@ public:
 //extern TAgcSetDlg *AgcSetDlg;
 extern int PageIndex;
 //----------------------------------------------------------------------------
-#endif    
+#endif
