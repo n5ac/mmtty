@@ -81,7 +81,8 @@ enum {
     RXM_SETLENGTH,
     RXM_ENBSHARED,
 
-    RXM_PTTFSK,		// 30	Added by JE3HHT on Sep.2010
+	RXM_PTTFSK,		// 30	Added by JE3HHT on Sep.2010
+	RXM_SOUNDSOURCE,// 31	Added by AA6YQ in 1.70F
 //--------------------------------------
 	TXM_HANDLE=0x8000,	// MMTTY -> APP
 	TXM_REQHANDLE,
@@ -647,6 +648,8 @@ __published:	// IDE 管理のコンポーネント
 	void __fastcall KMOptClick(TObject *Sender);
 	void __fastcall KViewClick(TObject *Sender);
 	void __fastcall KExtCmdClick(TObject *Sender);
+
+
 private:	// ユーザー宣言
 	WAVEFORMAT	wfm;
 

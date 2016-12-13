@@ -30,9 +30,20 @@
 #include <math.h>
 #include <mbstring.h>
 #include <SHELLAPI.H>
+								//AA6YQ  1.65D->1.66G,  JE3HHT 1.67
+#define	VERID	"Ver1.70"       //K6TU   1.68A -> 1.70A Hide FlexRadio Reserved and IQ Audio Devices
+#define	VERBETA	"G"             //JA7UDE 1.70A -> 1.70B G3WYW FT-991 CAT support
+								//AA6YQ  1.70C          added COM16-32 to PTT/FSK port selector and Radio port selector, added 991 to Yaesu Group selector entry
+								//AA6YQ  1.70D          prevent shift > 4000 Hz so CSlideFFT::Create does not divide by zero
+								//AA6YQ  1.70E          limit PTT/FSK port selector and Radio port selector to display only 8 items
+								//                      added COM33-64 to PTT/FSK port selector and Radio port selector
+								//                      added 891 to Yaesu Group selector entry
+								//                      added 991 and 891 to Model selector for Yaesu Group
+								//                      provide "Hide FlexRadio Reserved and IQ Audio Devices" checkbox on the Options panel's Soundcard tab.
+								//AA6YQ  1.70F          notify user if attempting to open FSK TxD port at low speed, as many serial port devices can't do this
+								//                      accept RXM_SOUNDSOURCE message to change soundcard source channel (mono, left, right)
+								//JA7UDE 1.70G          translate new 1.70F error message into Japanese
 
-#define	VERID	"Ver1.70"       //K6TU 1.68A -> 1.70A AA6YQ 1.65D->1.66G,  JE3HHT 1.67
-#define	VERBETA	"A"
 #define	VERTTL2	"MMTTY "VERID VERBETA
 #define	VERTTL  VERTTL2" (C) JE3HHT 2000-2010."
 
@@ -215,7 +226,8 @@ typedef struct {
 
 	int			m_SoundPriority;
 	int			m_SoundDevice;
-    int         m_SoundOutDevice;   //AA6YQ 1.66
+	int         m_SoundOutDevice;   //AA6YQ 1.66
+	int         m_HideFlexAudio;    //AA6YQ 1.70E
 	int			m_SoundStereo;
 	int			m_SoundFifoRX;
 	int			m_SoundFifoTX;

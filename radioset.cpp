@@ -29,7 +29,7 @@
 //Define Maker groups; index is used by IsCompatible to select the correct Maker based on PollType (RADIO_POLLx)
 LPCSTR	__MK[]={
 	"Yaesu FT 1000D, 1000MP, 920",                  //AA6YQ 1.66 cosmetic, MakerIndex=0
-    "Yaesu  FT 9000, 2000, 950, 450",                //AA6YQ 1.66         , MakerIndex=1
+	"Yaesu  FT 9000, 2000, 991, 891, 950, 450",                //AA6YQ 1.66         , MakerIndex=1
 	"Yaesu  FT 736, 817, 847, 857, 897",                            //AA6YQ 1.66 cosmetic, MakerIndex=2
 	"Icom  xx=addr 01-7F",                          //                   , MakerIndex=3
 	"Ten-Tec Omni VI  xx=addr 00-64",               //                   , MakerIndex=4
@@ -68,10 +68,12 @@ const POLLDEF	__VT0[]={
 
 const POLLDEF	__VT1[]={
 	{ "NONE", 0 },
-    { "FT-9000", RADIO_POLLFT9000 },    //1.66B AA6YQ
-    { "FT-2000", RADIO_POLLFT2000 },    //1.66B AA6YQ
-    { "FT-950", RADIO_POLLFT950 },      //1.66B AA6YQ
-    { "FT-450", RADIO_POLLFT450 },      //1.66B AA6YQ
+	{ "FT-9000", RADIO_POLLFT9000 },    //1.66B AA6YQ
+	{ "FT-2000", RADIO_POLLFT2000 },    //1.66B AA6YQ
+	{ "FT-950", RADIO_POLLFT950 },      //1.66B AA6YQ
+	{ "FT-450", RADIO_POLLFT450 },      //1.66B AA6YQ
+	{ "FT-991", RADIO_POLLFT991 },      //1.70E AA6YQ
+	{ "FT-891", RADIO_POLLFT891 },      //1.70E AA6YQ
 	{ NULL, 0 },
 };
 
@@ -121,10 +123,12 @@ const POLLDEF	__VTUNKNOWN[]={
 	{ "KENWOOD (use auto info)", RADIO_POLLKENWOODN },
 	{ "JST245", RADIO_POLLJST245 },
 	{ "JST245 (use auto info)", RADIO_POLLJST245N },
-    { "YAESU FT-9000", RADIO_POLLFT9000 },  //1.66B AA6YQ
-    { "YAESU FT-2000", RADIO_POLLFT2000 },  //1.66B AA6YQ
+	{ "YAESU FT-9000", RADIO_POLLFT9000 },  //1.66B AA6YQ
+	{ "YAESU FT-2000", RADIO_POLLFT2000 },  //1.66B AA6YQ
     { "YAESU FT-950", RADIO_POLLFT950 },    //1.66B AA6YQ
     { "YAESU FT-450", RADIO_POLLFT450 },    //1.66B AA6YQ
+	{ "YAESU FT-991", RADIO_POLLFT991 },      //1.70E AA6YQ
+	{ "YAESU FT-891", RADIO_POLLFT891 },      //1.70E AA6YQ
 	{ NULL, 0 },
 };
 const POLLDEF	*__VL[]={
@@ -151,7 +155,11 @@ __fastcall TRADIOSetDlg::TRADIOSetDlg(TComponent* AOwner)
 	for( int i = 0; i < m_MMList.GetCount(); i++ ){
 		PortName->Items->Insert(1, m_MMList.GetItemName(i));
 	}
-	PortName->DropDownCount = PortName->Items->Count;
+
+	//AA6YQ 1.70E
+	//PortName->DropDownCount = PortName->Items->Count;
+	PortName->DropDownCount = 8;
+
 	m_DisEvent = 0;
 }
 //---------------------------------------------------------------------
@@ -388,21 +396,27 @@ int __fastcall TRADIOSetDlg::IsCompatible(int PollType, int MakerIndex)
             return 0;
         }
     }
-    else if (MakerIndex == 1)   {  //MakerIndex 1 is Yaesu FT-9000 et al
+	else if (MakerIndex == 1)   {  //MakerIndex 1 is Yaesu FT-9000 et al
         if (PollType == 0){
             return 1;
         }
         else if (PollType == RADIO_POLLFT9000) {
             return 1;
 		}
-        else if (PollType == RADIO_POLLFT2000) {
+		else if (PollType == RADIO_POLLFT2000) {
             return 1;
         }
-        else if (PollType == RADIO_POLLFT950) {
-            return 1;
-        }
-        else if (PollType == RADIO_POLLFT450) {
-            return 1;
+		else if (PollType == RADIO_POLLFT950) {
+			return 1;
+		}
+		else if (PollType == RADIO_POLLFT450) {
+			return 1;
+		}
+		else if (PollType == RADIO_POLLFT991) {
+			return 1;
+		}
+		else if (PollType == RADIO_POLLFT891) {
+			return 1;
         }
         else {
             return 0;
@@ -559,4 +573,5 @@ void __fastcall TRADIOSetDlg::SBHelpClick(TObject *Sender)
 	ShowHtmlHelp("radiocommand.htm");
 }
 //---------------------------------------------------------------------------
+
 

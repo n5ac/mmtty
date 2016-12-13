@@ -108,7 +108,7 @@ private:
 	int				m_DisEvent;
 	int __fastcall IsXX(void);
 	int __fastcall IsSame(LPCSTR v, LPCSTR t);
-    int __fastcall IsCompatible(int PollType, int MakerIndex); //AA6YQ 1.6.6
+    int __fastcall IsCompatible(int PollType, int MakerIndex); //AA6YQ 1.66
 	void __fastcall SetMaker(void);
 	void __fastcall UpdateUI(void);
 	void __fastcall SetVFOList(void);

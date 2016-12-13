@@ -37,7 +37,7 @@ static int PageIndexBPF = 0;
 
 // Static array to map selected audio devices from radio group index
 // to unit number - one each for input & output devices
-// K6TU 3/17/2015
+// K6TU 1.70A 3/17/2015
 static int InputDeviceMap[16];
 static int OutputDeviceMap[16];
 //---------------------------------------------------------------------
@@ -64,7 +64,7 @@ __fastcall TOptionDlg::TOptionDlg(TComponent* AOwner)
 	SetComboBox(pllVCOGain, MmttyWd->m_asVCOGain.c_str());
 	SetComboBox(pllLoopFC, MmttyWd->m_asLoopFC.c_str());
 
-	//K6TU
+	//K6TU 1.70A
 	// Amended enumeration of audio units to review the
 	// first 32 units for each of input & output.
 	//
@@ -85,10 +85,12 @@ __fastcall TOptionDlg::TOptionDlg(TComponent* AOwner)
 		devName = MmttyWd->pSound->GetInputSoundcard(CurrentUnit);
 		cString = AnsiString(devName).c_str();
 
-		if (strstr(cString, "IQ") || strstr(cString, "RESERVED")) {
-			// This is one of the FlexRadio audio devices we don't want
-			CurrentUnit++;
-			continue;
+		if (sys.m_HideFlexAudio) { //AA6YQ 1.70E
+			if (strstr(cString, "IQ") || strstr(cString, "RESERVED")) {
+				// This is one of the FlexRadio audio devices we don't want
+				CurrentUnit++;
+				continue;
+			}
 		}
 
 		// This is a device we want...
@@ -113,10 +115,12 @@ __fastcall TOptionDlg::TOptionDlg(TComponent* AOwner)
 		devName = MmttyWd->pSound->GetOutputSoundcard(CurrentUnit);
 		cString = AnsiString(devName).c_str();
 
-		if (strstr(cString, "IQ") || strstr(cString, "RESERVED")) {
-			// This is one of the FlexRadio audio devices we don't want
-			CurrentUnit++;
-			continue;
+		if (sys.m_HideFlexAudio) { //AA6YQ 1.70E
+			if (strstr(cString, "IQ") || strstr(cString, "RESERVED")) {
+				// This is one of the FlexRadio audio devices we don't want
+				CurrentUnit++;
+				continue;
+			}
 		}
 
 		// This is a device we want...
@@ -514,9 +518,11 @@ int __fastcall TOptionDlg::Execute(CFSKDEM *fp, CFSKMOD *mp)
 	FifoTX->Text = sys.m_SoundFifoTX;
 	SoundPriority->ItemIndex = sys.m_SoundPriority;
 
+	HideFlexAudio->Checked = sys.m_HideFlexAudio; //AA6YQ 1.70E
+
 	if( sys.m_SoundDevice == -2 ){
 		DevNo->Text = sys.m_SoundMMW;
-    }
+	}
     else {
 		DevNo->Text = sys.m_SoundDevice;
     }
@@ -525,13 +531,14 @@ int __fastcall TOptionDlg::Execute(CFSKDEM *fp, CFSKMOD *mp)
 	if( sys.m_SoundOutDevice == -2 ){
         DevOutNo->Text = sys.m_SoundMMW;
     }
-    else {
-        DevOutNo->Text = sys.m_SoundOutDevice;
-    }
+	else {
+		DevOutNo->Text = sys.m_SoundOutDevice;
+	}
 
 	//AA6YQ 1.66
-	//K6TU
+	//K6TU 1.70A
 	if (IsSoundcard (AnsiString(DevNo->Text).c_str())) {	//JA7UDE 0428
+
 		// Assuming that devices haven't been re-enumerated by Windows,
 		// we need to find the corresponding unit number in the map in order
 		// to select the right unit
@@ -542,6 +549,7 @@ int __fastcall TOptionDlg::Execute(CFSKDEM *fp, CFSKMOD *mp)
 				break;
 			}
 		}
+
 		InputSoundcards->ItemIndex = i != 16 ? i : -1;
 		// InputSoundcards->ItemIndex = atoi(AnsiString(DevNo->Text).c_str());  //AA6YQ 1.66	//JA7UDE 0428
 	}
@@ -550,8 +558,9 @@ int __fastcall TOptionDlg::Execute(CFSKDEM *fp, CFSKMOD *mp)
 	}
 
 	//AA6YQ 1.66
-	//K6TU
+	//K6TU 1.70A
 	if (IsSoundcard (AnsiString(DevOutNo->Text).c_str())) {	//JA7UDE 0428
+
 		// Assuming that devices haven't been re-enumerated by Windows,
 		// we need to find the corresponding unit number in the map in order
 		// to select the right unit
@@ -562,8 +571,10 @@ int __fastcall TOptionDlg::Execute(CFSKDEM *fp, CFSKMOD *mp)
 				break;
 			}
 		}
+
 		OutputSoundcards->ItemIndex = i != 16 ? i : -1;
 		// OutputSoundcards->ItemIndex = atoi(AnsiString(DevOutNo->Text).c_str());  //AA6YQ 1.66	//JA7UDE 0428
+
 	}
 	else {
 		OutputSoundcards->ItemIndex =-1;
@@ -820,8 +831,10 @@ int __fastcall TOptionDlg::Execute(CFSKDEM *fp, CFSKMOD *mp)
 
 		sys.m_SoundPriority = SoundPriority->ItemIndex;
 
+		sys.m_HideFlexAudio=HideFlexAudio->Checked; //AA6YQ 1.70E
+
 		if( sscanf(AnsiString(DevNo->Text).c_str(), "%d", &dd) == 1 ){	//JA7UDE 0428
-			// Find the unit number in the input map and update
+			//K6TU 1.70A Find the unit number in the input map and update
 			sys.m_SoundDevice = InputDeviceMap[dd];
 			// sys.m_SoundDevice = dd;
 		}
@@ -832,7 +845,7 @@ int __fastcall TOptionDlg::Execute(CFSKDEM *fp, CFSKMOD *mp)
 
 		//AA6YQ 1.66
 		if( sscanf(AnsiString(DevOutNo->Text).c_str(), "%d", &dd) == 1 ){	//JA7UDE 0428
-			// Find the unit in the output map and update
+			//K6TU 1.70A Find the unit in the output map and update
 			sys.m_SoundOutDevice = OutputDeviceMap[dd];
 			// sys.m_SoundOutDevice = dd;
 		}
@@ -1560,7 +1573,9 @@ void __fastcall TOptionDlg::PortNameDropDown(TObject *Sender)
 		for( int i = 0; i < m_MMList.GetCount(); i++ ){
 			PortName->Items->Add(m_MMList.GetItemName(i));
 		}
-		PortName->DropDownCount = PortName->Items->Count;
+		//AA6YQ 1.70E
+		//PortName->DropDownCount = PortName->Items->Count;
+		PortName->DropDownCount = 8;
 	}
 }
 //---------------------------------------------------------------------------
@@ -1620,8 +1635,8 @@ void __fastcall TOptionDlg::DevOutNoDropDown(TObject *Sender)
 
 void __fastcall TOptionDlg::InputSoundcardsClick(TObject *Sender)
 {
-    //AA6YQ 1.66
-    DevNo->ItemIndex = InputSoundcards->ItemIndex+1;
+	//AA6YQ 1.66
+	DevNo->ItemIndex = InputSoundcards->ItemIndex+1;
 }
 //---------------------------------------------------------------------------
 
@@ -1632,7 +1647,7 @@ void __fastcall TOptionDlg::DevNoClick(TObject *Sender)
 		InputSoundcards->ItemIndex = atoi(AnsiString(DevNo->Text).c_str());  //AA6YQ 1.66	//JA7UDE 0428
     }
     else {
-        InputSoundcards->ItemIndex =-1;
+		InputSoundcards->ItemIndex =-1;
     }
 }
 //---------------------------------------------------------------------------
@@ -1653,7 +1668,7 @@ void __fastcall TOptionDlg::DevOutNoClick(TObject *Sender)
 		OutputSoundcards->ItemIndex = atoi(AnsiString(DevOutNo->Text).c_str());  //AA6YQ 1.66	//JA7UDE 0428
     }
     else {
-        OutputSoundcards->ItemIndex =-1;
+		OutputSoundcards->ItemIndex =-1;
     }
 }
 //---------------------------------------------------------------------------
@@ -1669,4 +1684,156 @@ void __fastcall TOptionDlg::SBAA6YQClick(TObject *Sender)
 	delete pBox;
 }
 //---------------------------------------------------------------------------
+
+void __fastcall TOptionDlg::HideFlexAudioClick(TObject *Sender)
+{
+	int CountUnits = 0;
+	int CurrentUnit = 0;
+
+	int unitnum;
+	int i;
+	int NewDeviceNumber;
+
+	int InputDeviceNumber;
+	int MappedInputDeviceNumber;
+	int OutputDeviceNumber;
+	int MappedOutputDeviceNumber;
+
+	LPCSTR devName;
+	char *cString;
+
+	InputDeviceNumber = atoi(AnsiString(DevNo->Text).c_str());
+
+	if (InputDeviceNumber < 16) {
+		MappedInputDeviceNumber = InputDeviceMap[InputDeviceNumber];
+	} else {
+		MappedInputDeviceNumber=-1;
+	}
+
+	OutputDeviceNumber = atoi(AnsiString(DevOutNo->Text).c_str());
+
+	if (OutputDeviceNumber < 16) {
+		MappedOutputDeviceNumber = OutputDeviceMap[OutputDeviceNumber];
+	} else {
+		MappedOutputDeviceNumber=-1;
+	}
+
+	InputSoundcards->Items->BeginUpdate();
+	InputSoundcards->Items->Clear();
+
+	while (CountUnits < 16 && CurrentUnit < 32) {
+		devName = MmttyWd->pSound->GetInputSoundcard(CurrentUnit);
+		cString = AnsiString(devName).c_str();
+
+		if (HideFlexAudio->Checked) { //AA6YQ 1.70E
+			if (strstr(cString, "IQ") || strstr(cString, "RESERVED")) {
+				// This is one of the FlexRadio audio devices we don't want
+				CurrentUnit++;
+				continue;
+			}
+		}
+
+		// This is a device we want...
+		if (devName) {
+			InputSoundcards->Items->Add(devName);
+			InputDeviceMap[CountUnits++] = CurrentUnit++;
+		} else {
+			CurrentUnit++;
+		}
+	}
+	// for( int i = 0; i < 16; i++ ){
+	// 		InputSoundcards->Items->Add(MmttyWd->pSound->GetInputSoundcard(i));
+	// }
+	InputSoundcards->Items->EndUpdate();
+
+	if (HideFlexAudio->Checked != sys.m_HideFlexAudio) {
+
+		NewDeviceNumber=-1;
+
+		if (IsSoundcard (AnsiString(DevNo->Text).c_str())) {
+
+			if (HideFlexAudio->Checked) {
+
+				for (i=0; i < 16; i++) {
+					if (InputDeviceMap[i] == InputDeviceNumber) {
+						break;
+					}
+				}
+
+				NewDeviceNumber = i != 16 ? i : -1;
+
+			} else {
+
+				NewDeviceNumber = MappedInputDeviceNumber;
+
+			}
+		}
+
+		InputSoundcards->ItemIndex = NewDeviceNumber;
+		DevNo->ItemIndex = NewDeviceNumber+1;
+		sys.m_SoundDevice = NewDeviceNumber;
+	}
+
+
+	OutputSoundcards->Items->BeginUpdate();
+	OutputSoundcards->Items->Clear();
+
+	CountUnits = 0;
+	CurrentUnit = 0;
+	while (CountUnits < 16 && CurrentUnit < 32) {
+		devName = MmttyWd->pSound->GetOutputSoundcard(CurrentUnit);
+		cString = AnsiString(devName).c_str();
+
+		if (HideFlexAudio->Checked) { //AA6YQ 1.70E
+			if (strstr(cString, "IQ") || strstr(cString, "RESERVED")) {
+				// This is one of the FlexRadio audio devices we don't want
+				CurrentUnit++;
+				continue;
+			}
+		}
+
+		// This is a device we want...
+		if (devName) {
+			OutputSoundcards->Items->Add(devName);
+			OutputDeviceMap[CountUnits++] = CurrentUnit++;
+		} else {
+			CurrentUnit++;
+		}
+	}
+	//for( int i = 0; i < 16; i++ ){
+	//	OutputSoundcards->Items->Add(MmttyWd->pSound->GetOutputSoundcard(i));
+	//}
+	OutputSoundcards->Items->EndUpdate();
+
+	if (HideFlexAudio->Checked != sys.m_HideFlexAudio) {
+
+		NewDeviceNumber=-1;
+
+		if (IsSoundcard (AnsiString(DevOutNo->Text).c_str())) {
+
+			if (HideFlexAudio->Checked) {
+
+				for (i=0; i < 16; i++) {
+					if (OutputDeviceMap[i] == OutputDeviceNumber) {
+						break;
+					}
+				}
+
+				NewDeviceNumber = i != 16 ? i : -1;
+
+			} else {
+				NewDeviceNumber = MappedOutputDeviceNumber;
+			}
+		}
+
+		OutputSoundcards->ItemIndex = NewDeviceNumber;
+		DevOutNo->ItemIndex = NewDeviceNumber+1;
+		sys.m_SoundOutDevice = NewDeviceNumber;
+
+	}
+
+	sys.m_HideFlexAudio = HideFlexAudio->Checked;
+}
+//---------------------------------------------------------------------------
+
 
