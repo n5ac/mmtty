@@ -32,7 +32,7 @@
 #include <SHELLAPI.H>
 								//AA6YQ  1.65D->1.66G,  JE3HHT 1.67
 #define	VERID	"Ver1.70"       //K6TU   1.68A -> 1.70A Hide FlexRadio Reserved and IQ Audio Devices
-#define	VERBETA	"G"             //JA7UDE 1.70A -> 1.70B G3WYW FT-991 CAT support
+#define	VERBETA	"H"             //JA7UDE 1.70A -> 1.70B G3WYW FT-991 CAT support
 								//AA6YQ  1.70C          added COM16-32 to PTT/FSK port selector and Radio port selector, added 991 to Yaesu Group selector entry
 								//AA6YQ  1.70D          prevent shift > 4000 Hz so CSlideFFT::Create does not divide by zero
 								//AA6YQ  1.70E          limit PTT/FSK port selector and Radio port selector to display only 8 items
@@ -43,6 +43,7 @@
 								//AA6YQ  1.70F          notify user if attempting to open FSK TxD port at low speed, as many serial port devices can't do this
 								//                      accept RXM_SOUNDSOURCE message to change soundcard source channel (mono, left, right)
 								//JA7UDE 1.70G          translate new 1.70F error message into Japanese
+								//AA6YQ  1.70H          correct regression in 1.70E that prevents correct frequency tracking for FT-891 and FT-991
 
 #define	VERTTL2	"MMTTY "VERID VERBETA
 #define	VERTTL  VERTTL2" (C) JE3HHT 2000-2010."

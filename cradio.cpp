@@ -791,7 +791,9 @@ void CCradio::CatchPoll(BYTE c)
 		case RADIO_POLLFT9000:
 		case RADIO_POLLFT2000:
         case RADIO_POLLFT950:
-        case RADIO_POLLFT450:
+		case RADIO_POLLFT450:
+		case RADIO_POLLFT891:      //1.70H
+		case RADIO_POLLFT991:      //1.70H
 			if( m_rxcnt < sizeof(m_rxbuf) ){
 				if( (c != 0x0d) && (c != 0x0f) ){
 					if( (c != ' ') || m_rxcnt ){
