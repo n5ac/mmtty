@@ -347,6 +347,7 @@ void __fastcall TOptionDlg::UpdateUI(void)
 	GB4->Enabled = f;
 	SetGroupEnabled(GB4);
 	Source->Enabled = f;
+
 }
 //---------------------------------------------------------------------------
 TSpeedButton *__fastcall TOptionDlg::GetSB(int n)
@@ -613,6 +614,9 @@ int __fastcall TOptionDlg::Execute(CFSKDEM *fp, CFSKMOD *mp)
 	}
 	UpdateUI();
 	m_DisEvent = 0;
+
+	SetupTimer->Enabled= True; //1.70K
+
 	int r = ShowModal();
 	if( r == IDOK ){
 		m_DisEvent++;
@@ -929,6 +933,8 @@ int __fastcall TOptionDlg::Execute(CFSKDEM *fp, CFSKMOD *mp)
 		if( sys.m_TxPort != TxPort->ItemIndex ) COMM.change = 1;
 		sys.m_TxPort = TxPort->ItemIndex;
 		sys.m_MemWindow = MemWin->Checked;
+
+		sys.m_SetupOnTop = SetupOnTop->Checked; //1.70K
 	}
 	else {
 		r = FALSE;
@@ -1472,6 +1478,7 @@ void __fastcall TOptionDlg::DefBtnClick(TObject *Sender)
 	pllOutFC->Text = 200;
 	HamBtnClick(NULL);
 }
+
 //---------------------------------------------------------------------------
 void __fastcall TOptionDlg::RadioBtnClick(TObject *Sender)
 {
@@ -1836,4 +1843,25 @@ void __fastcall TOptionDlg::HideFlexAudioClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+
+void __fastcall TOptionDlg::SetupOnTopClick(TObject *Sender)
+{
+	sys.m_SetupOnTop = SetupOnTop->Checked; //1.70K
+	if( sys.m_SetupOnTop ){
+		FormStyle = fsStayOnTop;
+		}
+	else {
+		FormStyle = fsNormal;
+	}
+}
+
+
+void __fastcall TOptionDlg::SetupTimerTimer(TObject *Sender)
+{
+
+	SetupTimer->Enabled=False;
+
+	SetupOnTop->Checked = sys.m_SetupOnTop;   //1.70K
+}
+//---------------------------------------------------------------------------
 

@@ -280,6 +280,8 @@ __published:
 	TCheckBox *CBAA6YQ;
 	TSpeedButton *SBAA6YQ;
 	TCheckBox *HideFlexAudio;
+	TCheckBox *SetupOnTop;
+	TTimer *SetupTimer;
 	void __fastcall HamBtnClick(TObject *Sender);
 
 	
@@ -353,6 +355,8 @@ __published:
 
 	void __fastcall SBAA6YQClick(TObject *Sender);
 	void __fastcall HideFlexAudioClick(TObject *Sender);
+	void __fastcall SetupOnTopClick(TObject *Sender);
+	void __fastcall SetupTimerTimer(TObject *Sender);
 
 
 private:

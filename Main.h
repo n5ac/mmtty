@@ -41,8 +41,9 @@
 #include "SendFile.h"
 #define	USEPAL	1
 #define	SQSCALE		1024	// SQ の表示スケール
-#define	HELPNAME_A	"MMTTY.CHM"
+#define	HELPNAME_A	"MMTTY.chm"
 #define	HELPNAME_B	"MMTTY.HLP"
+
 //---------------------------------------------------------------------------
 enum {
 	RXM_HANDLE=0x0000,	// APP -> MMTTY
@@ -334,7 +335,6 @@ __published:	// IDE 管理のコンポーネント
 	TMenuItem *KFFTRF;
 	TMenuItem *KPaste;
 	TMenuItem *N16;
-	TMenuItem *KW7TI;
 	TMenuItem *KWebWSK;
 	TMenuItem *N17;
 	TMenuItem *KTNC;
@@ -595,13 +595,12 @@ __published:	// IDE 管理のコンポーネント
 	void __fastcall KFFTRMClick(TObject *Sender);
 	void __fastcall KFFTRFClick(TObject *Sender);
 	void __fastcall KPasteClick(TObject *Sender);
-	void __fastcall KW7TIClick(TObject *Sender);
 	void __fastcall KWebWSKClick(TObject *Sender);
 	void __fastcall KTNCClick(TObject *Sender);
 	void __fastcall KRMClick(TObject *Sender);
 	
 	void __fastcall LTapClick(TObject *Sender);
-	
+
 	void __fastcall KMacClick(TObject *Sender);
 	void __fastcall KENTClick(TObject *Sender);
 
