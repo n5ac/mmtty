@@ -161,7 +161,7 @@ __fastcall TMmttyWd::TMmttyWd(TComponent* Owner)
 		sys.m_FontCharset = ANSI_CHARSET;
 		Log.m_LogSet.m_TimeZone = 'Z';
 		sys.m_TimeStampUTC = 1;
-		sys.m_HTMLHelp = "KB2EOQ.htm";
+		sys.m_HTMLHelp = HELPNAME_A; //AA6YQ 1.70J was KB2EOQ.htm
 		KENT->Checked = FALSE;
 		sys.m_LWait = 2;
 		sys.m_LogLink = 0;
@@ -179,6 +179,7 @@ __fastcall TMmttyWd::TMmttyWd(TComponent* Owner)
 		sys.m_LWait = 0;
 		sys.m_LogLink = 1;
 	}
+
 	sys.m_WinFontStyle = 0;
 	sys.m_BtnFontStyle = 0;
 	sys.m_Help = "Mmtty.txt";
@@ -513,21 +514,32 @@ __fastcall TMmttyWd::TMmttyWd(TComponent* Owner)
 	WriteProfile(1025, "Default", TRUE);				// デフォルトパラメータの記憶
 	ReadRegister();
 	WriteProfile(1026, "Return to the startup", TRUE);	// デフォルトパラメータの記憶
-	sprintf(bf, "%s"HELPNAME_A, BgnDir);
-	if( (sys.m_HTMLHelp == HELPNAME_A)||(sys.m_HTMLHelp == HELPNAME_B) ){
-		sys.m_HTMLHelp = "";
+
+	//AA6YQ 1.70J
+
+	if( lcid != LANG_JAPANESE ){
+		sprintf(bf, "%s"HELPNAME_A, BgnDir);
 	}
 	if( IsFile(bf) ){
-		sys.m_HTMLHelp = HELPNAME_A;
-		JanHelp = bf;
-    }
-    else {
-		sprintf(bf, "%s"HELPNAME_B, BgnDir);
-		if( IsFile(bf) ){
-			sys.m_HTMLHelp = HELPNAME_B;
 			JanHelp = bf;
-        }
-    }
+	}
+
+	//sprintf(bf, "%s"HELPNAME_A, BgnDir);
+	//if( (sys.m_HTMLHelp == HELPNAME_A)||(sys.m_HTMLHelp == HELPNAME_B) ){
+	//	sys.m_HTMLHelp = "";
+	//}
+	//if( IsFile(bf) ){
+	//	sys.m_HTMLHelp = HELPNAME_A;
+	//	JanHelp = bf;
+	//}
+	//else {
+	//	sprintf(bf, "%s"HELPNAME_B, BgnDir);
+	//	if( IsFile(bf) ){
+	//		sys.m_HTMLHelp = HELPNAME_B;
+	//		JanHelp = bf;
+	//    }
+	//}
+
 #if 0
 	if( !strcmpi(GetEXT(sys.m_HTMLHelp.c_str()), "HLP") || !strcmpi(GetEXT(sys.m_HTMLHelp.c_str()), "CHM") ){
 		sprintf(bf, "%s%s", BgnDir, sys.m_HTMLHelp.c_str());
@@ -954,7 +966,7 @@ void __fastcall TMmttyWd::UpdateSystemFont(void)
 		KExtSusp->Caption = "Suspend(&S)";
 
 		KSetHelp->Caption = "Setup Help(&S)...";
-		KWebHHT->Caption = "JE3HHT WebSite (Japanese)";
+		KWebHHT->Caption = "MM Open Source WebSite";
 		KWebJARTS->Caption = "JARTS WebSite";
 		KDispVer->Caption = "About MMTTY(&A)";
 
@@ -1908,11 +1920,18 @@ void __fastcall TMmttyWd::ReadRegister(void)
 				Height = pIniFile->ReadInteger("Window", "WindowHeightN", Height);
 			}
 		}
+
 	}
+
+	sys.m_SetupOnTop = pIniFile->ReadInteger("Window", "SetupOnTop", sys.m_SetupOnTop);   //1.70K
 
 	sys.m_WinFontName = pIniFile->ReadString("WindowFont", "Name", sys.m_WinFontName);
 	sys.m_WinFontCharset = (BYTE)pIniFile->ReadInteger("WindowFont", "Charset", sys.m_WinFontCharset);
 	sys.m_WinFontStyle = pIniFile->ReadInteger("WindowFont", "Style", sys.m_WinFontStyle);
+
+	//hack for forcing font to English (0) or Japanese (SHIFTJIS_CHARSET)
+	//sys.m_WinFontCharset = 0; //SHIFTJIS_CHARSET;
+
 	sys.m_FontAdjSize = pIniFile->ReadInteger("WindowFont", "Adjust", sys.m_FontAdjSize);
 	sys.m_BtnFontName = pIniFile->ReadString("ButtonFont", "Name", sys.m_BtnFontName);
 	sys.m_BtnFontCharset = (BYTE)pIniFile->ReadInteger("ButtonFont", "Charset", sys.m_BtnFontCharset);
@@ -2295,6 +2314,9 @@ void __fastcall TMmttyWd::WriteRegister(void)
 			}
 		}
 	}
+
+	pIniFile->WriteInteger("Window", "SetupOnTop", sys.m_SetupOnTop);  //1.70K
+
 	pIniFile->WriteInteger("Window", "Disable", sys.m_DisWindow);
 	pIniFile->WriteInteger("Window", "StayOnTop", sys.m_StayOnTop);
 
@@ -5298,12 +5320,16 @@ void __fastcall TMmttyWd::KFFTClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TMmttyWd::KWebHHTClick(TObject *Sender)
 {
-	WebRef.ShowHTML("http://www33.ocn.ne.jp/~je3hht/");
+	//1.70J
+	//WebRef.ShowHTML("http://www33.ocn.ne.jp/~je3hht/");
+	WebRef.ShowHTML("http://mm-open.org/");
 }
 //---------------------------------------------------------------------------
 void __fastcall TMmttyWd::KWebJARTSClick(TObject *Sender)
 {
-	WebRef.ShowHTML("http://jarts.web.fc2.com/");
+	//1.70J
+	//WebRef.ShowHTML("http://jarts.web.fc2.com/");
+	WebRef.ShowHTML("http://jarts.jp/");
 }
 //---------------------------------------------------------------------------
 void __fastcall TMmttyWd::KWebGRPClick(TObject *Sender)
@@ -5313,12 +5339,16 @@ void __fastcall TMmttyWd::KWebGRPClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TMmttyWd::KWebENGClick(TObject *Sender)
 {
-	WebRef.ShowHTML("http://mmhamsoft.amateur-radio.ca/");
+	//1.70J
+	//WebRef.ShowHTML("http://mmhamsoft.amateur-radio.ca/");
+	WebRef.ShowHTML("http://hamsoft.ca/");
 }
 //---------------------------------------------------------------------------
 void __fastcall TMmttyWd::KWebWSKClick(TObject *Sender)
 {
-	WebRef.ShowHTML("http://home.b01.itscom.net/ja1wsk/");
+	//1.70J
+	//WebRef.ShowHTML("http://home.b01.itscom.net/ja1wsk/");
+	WebRef.ShowHTML("http://home.b01.itscom.net/ja1wsk/mmtty00.html");
 }
 //---------------------------------------------------------------------------
 // MMTTY.Txtの表示メニュー
@@ -5337,11 +5367,7 @@ void __fastcall TMmttyWd::KHlpDigClick(TObject *Sender)
 	ShowHelp(this, sys.m_HelpDigital.c_str());
 }
 //---------------------------------------------------------------------------
-void __fastcall TMmttyWd::KW7TIClick(TObject *Sender)
-{
-	ShowHelp(this, "W7TI.TXT");
-}
-//---------------------------------------------------------------------------
+
 void __fastcall TMmttyWd::KRMClick(TObject *Sender)
 {
 	ShowHelp(this, (Font->Charset != SHIFTJIS_CHARSET) ? "EUpdate.txt" : "Update.txt");
@@ -7342,9 +7368,27 @@ void __fastcall TMmttyWd::KSetHelpClick(TObject *Sender)
 	DisPaint = TRUE;
 	TSetHelpBox *pBox = new TSetHelpBox(this);
 
+	//1.70K
+	if (sys.m_WinFontCharset == SHIFTJIS_CHARSET) {
+		pBox->GroupBox1->Visible=True;
+		pBox->GroupBox2->Visible=True;
+		pBox->GroupBox3->Visible=True;
+		pBox->GroupBox4->Visible=False;
+	}
+
+	else {
+		pBox->GroupBox1->Visible=False;
+		pBox->GroupBox2->Visible=False;
+		pBox->GroupBox3->Visible=False;
+		pBox->GroupBox4->Visible=True;
+	}
+
 	if( pBox->Execute() == TRUE ){
-		AddHelpMenu();
+
+		//AddHelpMenu();   //1.70K don't modify Help menu
+
 		UpdateSystemFont();
+
 	}
 	delete pBox;
 	TopWindow(this);
@@ -7353,47 +7397,17 @@ void __fastcall TMmttyWd::KSetHelpClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TMmttyWd::AddHelpMenu(void)
 {
-	if( (sys.m_HTMLHelp == HELPNAME_A) || (sys.m_HTMLHelp == HELPNAME_B) ){
-		if( KMHelp->Items[0]->OnClick != KAndyHelp ){
-			KMHelp->Delete(0);
-			KMHelp->Delete(0);
-			KMHelp->Delete(0);
-			KMHelp->Delete(0);
-			KMHelp->Delete(0);
-			KMHelp->Delete(0);
-			pAndyMenu = new TMenuItem(NULL);
-			pAndyMenu->Caption = "MMTTY Help";
-			pAndyMenu->OnClick = KAndyHelp;
-			KMHelp->Insert(0, pAndyMenu);
-		}
-	}
-	else if( !sys.m_HTMLHelp.IsEmpty() ){
-		if( KMHelp->Items[0]->OnClick == KAndyHelp ){
-			KMHelp->Delete(0);
-		}
-		else {
-			pAndyMenu2 = new TMenuItem(NULL);
-			pAndyMenu2->Caption = "-";
-			pAndyMenu2->OnClick = NULL;
-			KMHelp->Insert(0, pAndyMenu2);
-		}
-		char bf[256];
+	//1.70K only one Help Menu configuration
+
+	if(sys.m_WinFontCharset != SHIFTJIS_CHARSET){
+		KMHelp->Delete(0); //Delete 3 Japanese Help menu items
+		KMHelp->Delete(0);
+		KMHelp->Delete(0);
+
 		pAndyMenu = new TMenuItem(NULL);
-		if( !strcmpi(GetEXT(sys.m_HTMLHelp.c_str()), "HLP") ){
-			sprintf(bf, "MMTTY Help (%s)", sys.m_HTMLHelp.c_str());
-		}
-		else {
-			sprintf(bf, "HTML Help (%s)", sys.m_HTMLHelp.c_str());
-		}
-		pAndyMenu->Caption = bf;
+		pAndyMenu->Caption = "MMTTY Help";
 		pAndyMenu->OnClick = KAndyHelp;
 		KMHelp->Insert(0, pAndyMenu);
-	}
-	else {
-		if( KMHelp->Items[0]->OnClick == KAndyHelp ){
-			KMHelp->Delete(0);
-			KMHelp->Delete(0);
-		}
 	}
 }
 //---------------------------------------------------------------------------
@@ -9909,3 +9923,5 @@ void __fastcall TMmttyWd::KExtCmdClick(TObject *Sender)
 	KExtSusp->Enabled = !pSound->m_susp;
 }
 //---------------------------------------------------------------------------
+
+

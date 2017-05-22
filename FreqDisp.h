@@ -35,7 +35,14 @@
 */
 //----------------------------------------------------------------------------
 #include "fir.h"
-//----------------------------------------------------------------------------
+#include <System.Classes.hpp>
+
+#include <Vcl.Controls.hpp>
+#include <Vcl.ExtCtrls.hpp>
+#include <Vcl.StdCtrls.hpp>/
+#include <Vcl.StdCtrls.hpp>
+#include <Vcl.ExtCtrls.hpp>/
+#include <Vcl.StdCtrls.hpp>----------------------------------------------------------------------------
 class TFreqDispDlg : public TForm
 {
 __published:

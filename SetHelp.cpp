@@ -69,24 +69,36 @@ int __fastcall TSetHelpBox::Execute(void)
 //---------------------------------------------------------------------
 void __fastcall TSetHelpBox::JABtnClick(TObject *Sender)
 {
-	EditHTML->Text = "";
+	EditHTML->Text = "MMTTY.chm";   //1.70K
 	EditMMTTY->Text = "Mmtty.txt";
 	EditLog->Text = "Mmttylog.txt";
 	EditDigital->Text = "Digital.txt";
 	m_HelpFontName = "‚l‚r ƒSƒVƒbƒN";
 	m_HelpFontCharset = SHIFTJIS_CHARSET;
 	m_HelpFontSize = 10;
+
+	//1.70K hide English Help panels
+	GroupBox1->Visible=True;
+	GroupBox2->Visible=True;
+	GroupBox3->Visible=True;
+	GroupBox4->Visible=False;
 }
 //---------------------------------------------------------------------------
 void __fastcall TSetHelpBox::EngBtnClick(TObject *Sender)
 {
-	EditHTML->Text = "KB2EOQ.htm";
+	EditHTML->Text = "MMTTY.chm"; //1.70J
 	EditMMTTY->Text = "MmttyE.txt";
 	EditLog->Text = "LogE.txt";
 	EditDigital->Text = "DigitalE.txt";
 	m_HelpFontName = "Courier";//"Courier New";
 	m_HelpFontCharset = ANSI_CHARSET;
 	m_HelpFontSize = 10;
+
+	//1.70K hide Japanese Help panels
+	GroupBox1->Visible=False;
+	GroupBox2->Visible=False;
+	GroupBox3->Visible=False;
+	GroupBox4->Visible=True;       //1.70K
 }
 //---------------------------------------------------------------------------
 void __fastcall TSetHelpBox::FontBtnClick(TObject *Sender)

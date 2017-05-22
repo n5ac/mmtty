@@ -76,19 +76,23 @@ void __fastcall ShowHtmlHelp(LPCSTR pContext)
 			hd = Application->MainForm->Handle;
 		}
 
-		if( !strcmpi(GetEXT(bf), "HLP") ){
-			::WinHelp(hd, bf, HELP_FINDER, 0);
-		}
-		else if( !strcmpi(GetEXT(bf), "CHM") ){
+		//1.70K look for CHM first
+
+		if( !strcmpi(GetEXT(bf), "CHM") ){
 			if( pContext ){
 				char cmd[512];
-                sprintf(cmd, "HH.EXE %s::/%s", bf, pContext);
-                ::WinExec(cmd, SW_SHOWDEFAULT);
-            }
-            else {
+				sprintf(cmd, "HH.EXE %s::/%s", bf, pContext);
+				::WinExec(cmd, SW_SHOWDEFAULT);
+			}
+			else {
 				::ShellExecute(hd, "open", bf, NULL, NULL, SW_SHOWDEFAULT);
-            }
+			}
 		}
+
+		else if( !strcmpi(GetEXT(bf), "HLP") ){
+			::WinHelp(hd, bf, HELP_FINDER, 0);
+		}
+
 		else {
 			CWebRef	WebRef;
 			WebRef.ShowHTML(bf);
@@ -100,6 +104,7 @@ void __fastcall ShowHtmlHelp(LPCSTR pContext)
 	else {
 		ErrorMB( "'%s'が見つかりません.\r\n\r\nMMTTY English Web Site からダウンロードして下さい.", sys.m_HTMLHelp.c_str());
 	}
+
 }
 #if 0		// Delete by JE3HHT on 29.Sep.2010
 void ShowHelp(int index)
@@ -3403,7 +3408,9 @@ CWebRef::CWebRef()
 
 void CWebRef::ShowHTML(LPCSTR url)
 {
+
 	char    cmd[1024];
+
 	MakeCommand(cmd, HTML.c_str(), url);
 	::WinExec(cmd, SW_SHOWDEFAULT);
 }
