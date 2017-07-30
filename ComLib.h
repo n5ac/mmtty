@@ -32,7 +32,7 @@
 #include <SHELLAPI.H>
 								//AA6YQ  1.65D->1.66G,  JE3HHT 1.67
 #define	VERID	"Ver1.70"       //K6TU   1.68A -> 1.70A Hide FlexRadio Reserved and IQ Audio Devices
-#define	VERBETA	"K"             //JA7UDE 1.70A -> 1.70B G3WYW FT-991 CAT support
+#define	VERBETA	"L"             //JA7UDE 1.70A -> 1.70B G3WYW FT-991 CAT support
 								//AA6YQ  1.70C          added COM16-32 to PTT/FSK port selector and Radio port selector, added 991 to Yaesu Group selector entry
 								//AA6YQ  1.70D          prevent shift > 4000 Hz so CSlideFFT::Create does not divide by zero
 								//AA6YQ  1.70E          limit PTT/FSK port selector and Radio port selector to display only 8 items
@@ -46,7 +46,7 @@
 								//AA6YQ  1.70H          correct regression in 1.70E that prevents correct frequency tracking for FT-891 and FT-991
 								//AA6YQ  1.70J          update documentation and URLs
 								//AA6YQ  1.70K			limit Help menu to one arrangement, increase height of VerDSP dialog, add "Setup always on top" option
-
+								//JA7UDE 1.70L			display the profile name in use
 #define	VERTTL2	"MMTTY "VERID VERBETA
 #define	VERTTL  VERTTL2" Licensed under LGPL"       //1.70J
 
@@ -307,6 +307,10 @@ typedef struct {
 	int		m_LogLink;
 
 	AnsiString	m_LogName;
+	AnsiString  m_ProfileName; 	//JA7UDE 1.70L
+	int		m_ProfileNum;       //JA7UDE 1.70L
+	int		m_ProfileNumNew;	//JA7UDE 1.70L
+	AnsiString m_ProfileStartUp;//JA7UDE 1.70L
 
 	int		m_TxPort;		// 0-Sound, 1-DTR, 2-TXD
 	int		m_TxdStop;

@@ -37,6 +37,8 @@
 #include <ComCtrls.hpp>
 #include <Menus.hpp>
 #include <Dialogs.hpp>
+#include <string>
+#include <queue>
 //---------------------------------------------------------------------------
 #include "SendFile.h"
 #define	USEPAL	1
@@ -647,6 +649,7 @@ __published:	// IDE 管理のコンポーネント
 	void __fastcall KMOptClick(TObject *Sender);
 	void __fastcall KViewClick(TObject *Sender);
 	void __fastcall KExtCmdClick(TObject *Sender);
+	void __fastcall FormCreate(TObject *Sender);
 
 
 private:	// ユーザー宣言
@@ -940,6 +943,8 @@ public:		// ユーザー宣言
 	void __fastcall SetRemoteFFT(void);
 //Radio command機能のインプリメント
 	void __fastcall OpenCloseRadio(void);
+//
+	void __fastcall processOptions(LPTSTR);	//JA7UDE 1.70L
 
 //	void __fastcall TopWindow(void);
 

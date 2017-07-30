@@ -505,6 +505,8 @@ __fastcall TMmttyWd::TMmttyWd(TComponent* Owner)
 	sys.m_AutoTimeOffset = 0;
 	sys.m_TimeOffset = 0;
 	sys.m_TimeOffsetMin = 0;
+	sys.m_ProfileName = "Startup";			//JA7UDE 1.70L
+	sys.m_ProfileNum = -1;					//JA7UDE 1.70L
 //	Panel2->Top = GroupBox1->Height + 1;	// 受信画面サイズの調整
 	UpdatePanel();
 	LogLink.SetHandle(Handle, CM_CMML);
@@ -1702,7 +1704,20 @@ void __fastcall TMmttyWd::UpdateUI(void)
 			}
 			SelectCombo(TRUE);
 		}
-		if( m_filemode != pSound->WaveFile.m_mode ){
+		if( sys.m_ProfileNum != sys.m_ProfileNumNew ){  //JA7UDE 1.70L
+			AnsiString dem = "Demodulator ";  		//JA7UDE 1.70L
+			switch( m_DemType ){
+				case 0: dem += "(IIR) "; break;
+				case 1: dem += "(FIR) "; break;
+				case 2: dem += "(PLL) "; break;
+				case 3: dem += "(FFT) "; break;
+				default: break;
+			}
+			dem = dem + sys.m_ProfileName;    			//JA7UDE 1.70L
+			GroupDem->Caption = dem;  					//JA7UDE 1.70L
+			sys.m_ProfileNum = sys.m_ProfileNumNew;     //JA7UDE 1.70L
+		}
+   		if( m_filemode != pSound->WaveFile.m_mode ){
 			m_filemode = pSound->WaveFile.m_mode;
 			switch(m_filemode){
 				case 0:
@@ -2240,8 +2255,36 @@ void __fastcall TMmttyWd::ReadRegister(void)
 	if( verAA6YQ < VERAA6YQ ){
 		pAA6YQ->m_bpfTaps = 512;
 		pAA6YQ->m_befTaps = 256;
-    }
+	}
 	if( pAA6YQ->m_fEnabled ) pAA6YQ->Create();
+	delete pIniFile;
+
+//Profile option at startup, JA7UDE 1.70L $$
+	sprintf(bf, "%sUserPara.ini", BgnDir);
+	pIniFile = new TMemIniFile(bf);
+	if( sys.m_ProfileStartUp != "" ){
+		char key[32];
+		AnsiString pn;
+		bool isReadProfile = false;
+		for( int i = 0; i <= 1026; i++ ){
+			if( i >= 16 && i <= 1024 )
+				continue;
+			sprintf(key, "Define%d", i);
+			pn = pIniFile->ReadString( key, "Name", "Default" );
+			if( pn.UpperCase() == sys.m_ProfileStartUp.UpperCase() ){
+				ReadProfile( i, NULL );
+				isReadProfile = true;
+				break;
+			}
+		}
+		if( !isReadProfile ){
+			AnsiString msg = "Profile \"";
+			msg += sys.m_ProfileStartUp;
+			msg += "\" was specified, but it was not found in UserPara.ini. MMTTY will start with Profile \"Startup\".";
+			msg += " Note that if your profile has a space character, surround it with double quotation marks.";
+			MessageBox( NULL, msg.c_str(), "Warning", MB_OK );
+		}
+	}
 	delete pIniFile;
 }
 
@@ -6268,6 +6311,69 @@ void __fastcall TMmttyWd::KFFTW3Click(TObject *Sender)
 	pSound->DrawFFT(pBitmapFFTIN, 1, KXYScope->Checked ? PBoxXY->Width : 0);
 }
 //---------------------------------------------------------------------------
+void __fastcall TMmttyWd::processOptions(LPTSTR opts)  //JA7UDE 1.70L
+{
+
+	using std::string;
+	using std::queue;
+	string s;
+	queue<string> queue_opts;
+	int i;
+	s = "";
+	char sep = ' ';
+	int l = strlen(opts);
+	for( i = 0; i < l; i++ ){
+		if( opts[i] == '"' ){
+			if( sep != '"' ){
+				sep = '"';
+			}
+			else{
+				sep = ' ';
+			}
+		}
+		else if( opts[i] == sep ){
+			queue_opts.push(s);
+			sep = ' ';
+			s = "";
+			continue;
+		}
+		else{
+			s += opts[i];
+		}
+	}
+	queue_opts.push(s);
+	bool isProfileSpecified = false;
+	while( !queue_opts.empty() ){
+		string front = queue_opts.front();
+		//const char *f = front.c_str();
+		//printf( "%s", f );
+		if( isProfileSpecified ){
+			sys.m_ProfileStartUp = AnsiString( front.c_str() );
+			break;
+		}
+		else if( front == "-p" ){
+			isProfileSpecified = true;
+		}
+		queue_opts.pop();
+	}
+	/*
+	char *tp;
+	char s[1024];
+	strcpy( s, opts );
+	tp = strtok( s, " " );
+	bool isProfileSpecified = false;
+	while( tp != NULL ){
+		tp = strtok( NULL, " " );
+		if( tp != NULL && isProfileSpecified ){
+			sys.m_ProfileStartUp = tp;
+			break;
+		}
+		else if( tp != NULL && stricmp( tp, "-p" ) == 0 ){	//profile specified?
+			isProfileSpecified = true;
+		}
+	}
+	*/
+}
 void __fastcall TMmttyWd::FormShow(TObject *Sender)
 {
 	if( Remote & REMSHOWOFF ){
@@ -8970,6 +9076,13 @@ void __fastcall TMmttyWd::ReadProfile(int n, LPCSTR pName)
 	sprintf(key, "Define%d", n);
 
 	pSound->Suspend();
+	if( n == 1025 )															//JA7UDE 1.70L  $$
+	  sys.m_ProfileName = "Default";										//JA7UDE 1.70L
+	else if( n == 1026 )													//JA7UDE 1.70L
+	  sys.m_ProfileName = "Startup";										//JA7UDE 1.70L
+	else																	//JA7UDE 1.70L
+	  sys.m_ProfileName = pIniFile->ReadString( key, "Name", "Default" );	//JA7UDE 1.70L
+	sys.m_ProfileNumNew = n;                                              //JA7UDE 1.70L
 
 	sys.m_FixShift = pIniFile->ReadInteger(key, "AFCFixShift", sys.m_FixShift);
 	sys.m_AFC = pIniFile->ReadInteger(key, "AFC", sys.m_AFC);
@@ -9328,6 +9441,7 @@ void __fastcall TMmttyWd::KSClick(TObject *Sender)
 		TMenuItem *tp = GetKS(i);
 		if( tp == (TMenuItem *)Sender ){
 			ReadProfile(i, NULL);
+			sys.m_ProfileNum = -1;	//JA7UDE 1.70L
 			UpdateItem();
 			break;
 		}
@@ -9467,6 +9581,7 @@ void __fastcall TMmttyWd::KSLDClick(TObject *Sender)
 void __fastcall TMmttyWd::KSDEFClick(TObject *Sender)
 {
 	ReadProfile(1025, NULL);
+	sys.m_ProfileNum = -1;	//JA7UDE 1.70L
 	UpdateItem();
 	AdjustFocus();
 }
@@ -9474,6 +9589,7 @@ void __fastcall TMmttyWd::KSDEFClick(TObject *Sender)
 void __fastcall TMmttyWd::KSRETClick(TObject *Sender)
 {
 	ReadProfile(1026, NULL);
+	sys.m_ProfileNum = -1;	//JA7UDE 1.70L
 	UpdateItem();
 	AdjustFocus();
 }
@@ -9924,4 +10040,10 @@ void __fastcall TMmttyWd::KExtCmdClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+
+void __fastcall TMmttyWd::FormCreate(TObject *Sender)
+{
+	processOptions(GetCommandLine());	//JA7UDE 1.70L
+}
+//---------------------------------------------------------------------------
 

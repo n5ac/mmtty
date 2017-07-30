@@ -4,7 +4,7 @@
         <ProjectType>CppVCLApplication</ProjectType>
         <MainSource>mmtty.cpp</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <ProjectVersion>16.1</ProjectVersion>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
@@ -96,6 +96,8 @@
         <Icon_MainIcon>mmtty_Icon.ico</Icon_MainIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <Icon_MainIcon>mmtty_Icon.ico</Icon_MainIcon>
+        <Manifest_File>None</Manifest_File>
         <BCC_MonitorGlobalAndStackData>true</BCC_MonitorGlobalAndStackData>
         <BCC_MonitorThis>true</BCC_MonitorThis>
         <BCC_MonitorInlinePtrAccess>true</BCC_MonitorInlinePtrAccess>
@@ -119,7 +121,6 @@
         <BCC_MonitorGlobalAndStackData>false</BCC_MonitorGlobalAndStackData>
         <BCC_MonitorThis>false</BCC_MonitorThis>
         <BCC_MonitorInlinePtrAccess>false</BCC_MonitorInlinePtrAccess>
-        <Manifest_File>None</Manifest_File>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <BCC_Defines>_DEBUG;$(BCC_Defines);$(BCC_Defines)</BCC_Defines>
@@ -129,11 +130,24 @@
         <BCC_Defines>_DEBUG;$(BCC_Defines);$(BCC_Defines)</BCC_Defines>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <Icon_MainIcon>mmtty_Icon.ico</Icon_MainIcon>
+        <Manifest_File>None</Manifest_File>
         <IntermediateOutputDir>Release_Build</IntermediateOutputDir>
         <DCC_AdditionalSwitches> -M -$O+</DCC_AdditionalSwitches>
         <ILINK_LibraryPath>$(BDS)\lib\release;$(ILINK_LibraryPath);$(ILINK_LibraryPath)</ILINK_LibraryPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <FinalOutputDir>.</FinalOutputDir>
+        <Debugger_HostApplication>D:\MyProjects\amprog\mmtty-JA7UDE-1.70Lp\mmtty.exe</Debugger_HostApplication>
+        <Debugger_RunParams>-p Multi-path</Debugger_RunParams>
+        <BCC_EliminateDuplicateExpressions>true</BCC_EliminateDuplicateExpressions>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <BCC_LoopInductionReduction>true</BCC_LoopInductionReduction>
+        <BCC_ExpandIntrinsics>true</BCC_ExpandIntrinsics>
+        <BCC_OptimizeJumps>true</BCC_OptimizeJumps>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <BCC_OptimizeVariables>true</BCC_OptimizeVariables>
+        <BCC_EliminateDeadStore>true</BCC_EliminateDeadStore>
         <BCC_Defines>NDEBUG;$(BCC_Defines);$(BCC_Defines)</BCC_Defines>
         <BCC_UserSuppliedOptions> -tWM -Vx -d -Ve -r</BCC_UserSuppliedOptions>
     </PropertyGroup>
